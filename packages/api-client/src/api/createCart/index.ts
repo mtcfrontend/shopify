@@ -4,16 +4,16 @@ import { getCountry } from '../../helpers/utils'
 
 export default async function createCart(context, _params, _customQuery?: CustomQuery) {
 
-  const DEFAULT_MUTATION = gql`mutation checkoutCreate($input: CheckoutCreateInput!) {
-    checkoutCreate(input:$input){
-      checkout{
+  const DEFAULT_MUTATION = gql`mutation cartCreate($input: CartInput!) {
+    cartCreate(input: $input) {
+      cart {
         id
-        webUrl
+        checkoutUrl
       }
-      checkoutUserErrors {
-          code
-          field
-          message
+      userErrors {
+        field
+        message
+        code
       }
     }
   }`
@@ -26,19 +26,19 @@ export default async function createCart(context, _params, _customQuery?: Custom
     }
   }
 
-  const { checkoutCreate } = context.extendQuery(
+  const { cartCreate } = context.extendQuery(
       _customQuery,
       {
-        checkoutCreate: {
+        cartCreate: {
           mutation: DEFAULT_MUTATION,
           payload
         }
       }
   )
   return await context.client.apolloClient.mutate({
-    mutation: checkoutCreate.mutation,
-    variables: checkoutCreate.payload
+    mutation: cartCreate.mutation,
+    variables: cartCreate.payload
   }).then((result) => {
-    return result.data.checkoutCreate.checkout;
+    return result.data.cartCreate.cart;
   });
 }

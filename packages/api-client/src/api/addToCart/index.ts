@@ -4,161 +4,145 @@ import { getCountry } from '../../helpers/utils'
 export async function addToCart(context, params, _customQuery?: CustomQuery) {
   const { currentCart, product, quantity, customQuery } = params;
   // Items to be add to cart
-  const lineItemsToAdd = [{
-    variantId: product.variantBySelectedOptions && product.variantBySelectedOptions !== null ? product.variantBySelectedOptions.id : product.variantId,
-    quantity,
-    customAttributes: customQuery
-  }];
-  const DEFAULT_MUTATION = gql`mutation checkoutLineItemsAdd($country:CountryCode, $checkoutId: ID!, $lineItems: [CheckoutLineItemInput!]! ) @inContext(country:$country){
-  checkoutLineItemsAdd(checkoutId: $checkoutId, lineItems: $lineItems){
-    checkout{
-      appliedGiftCards{
-          id
-          amountUsedV2{
-            currencyCode
-            amount
-          }
-          balanceV2{
-            currencyCode
-            amount
-          }
-          
-        }
-        completedAt
-        createdAt
-        currencyCode
-        customAttributes{
-          key
-          value
-        }
-        discountApplications(first:20){
-          edges{
-            node{
-              ... on DiscountCodeApplication {
-                code
-                allocationMethod
-                targetType
-                targetSelection
-                value{
-                  ... on MoneyV2{
-                    amount
-                    currencyCode
-                  }
-                  ... on PricingPercentageValue{
-                    percentage
-                  }
-                }
-              }
-            }
-          }
-        }
-        email
+  const linesToAdd = [
+    {
+      merchandiseId: product.variantBySelectedOptions && product.variantBySelectedOptions !== null
+        ? product.variantBySelectedOptions.id
+        : product.variantId,
+      quantity,
+      attributes: customQuery.map(({ key, value }) => ({
+        key,
+        value
+      }))
+    }
+  ];
+  const DEFAULT_MUTATION = gql`mutation cartLinesAdd($country: CountryCode, $cartId: ID!, $lines: [CartLineInput!]!) @inContext(country: $country) {
+    cartLinesAdd(cartId: $cartId, lines: $lines) {
+      cart {
         id
-        lineItems(first:250){
-          edges{
-            node{
-              customAttributes{
+        checkoutUrl
+        createdAt
+        updatedAt
+        note
+        
+        lines(first: 250) {
+          edges {
+            node {
+              id
+              quantity
+              attributes {
                 key
                 value
               }
-              id
-              quantity
-              title
-              variant{
-                availableForSale
-                compareAtPriceV2{
-                  currencyCode
-                  amount
-                }
-                id
-                image{
-                  altText
+              merchandise {
+                ... on ProductVariant {
                   id
-                  height
-                  width
-                  src
-                }
-                priceV2{
-                  currencyCode
-                  amount
-                }
-                compareAtPriceV2{
-                  currencyCode
-                  amount
-                }
-                product{
-                  handle
-                  id
-                }
-                selectedOptions{
-                  name
-                  value
-                }
-                sku
-                title
-                unitPrice{
-                  currencyCode
-                  amount
+                  title
+                  availableForSale
+                  requiresShipping
+                  sku
+                  price {
+                    amount
+                    currencyCode
+                  }
+                  compareAtPrice {
+                    amount
+                    currencyCode
+                  }
+                  unitPrice {
+                    amount
+                    currencyCode
+                  }
+                  image {
+                    altText
+                    id
+                    src
+                    width
+                    height
+                  }
+                  product {
+                    id
+                    handle
+                  }
+                  selectedOptions {
+                    name
+                    value
+                  }
                 }
               }
             }
           }
         }
-        lineItemsSubtotalPrice{
-          currencyCode
-          amount
+  
+        discountCodes {
+          code
+          applicable
         }
-        note
-        order {
-          id
-        }
-        orderStatusUrl
-        paymentDueV2{
-          currencyCode
-          amount
-        }
-        ready
-        requiresShipping
-        shippingAddress {
-          id
-        }
-        shippingLine{
-          handle
-          priceV2{
-            currencyCode
+  
+        estimatedCost {
+          subtotalAmount {
             amount
+            currencyCode
           }
-          title
+          totalAmount {
+            amount
+            currencyCode
+          }
+          totalTaxAmount {
+            amount
+            currencyCode
+          }
         }
-        subtotalPriceV2{
-          currencyCode
-          amount
+  
+        attributes {
+          key
+          value
         }
-        taxExempt
-        taxesIncluded
-        totalPriceV2{
-          currencyCode
-          amount
+  
+        deliveryGroups {
+          edges {
+            node {
+              deliveryMethods {
+                handle
+                title
+                price {
+                  amount
+                  currencyCode
+                }
+              }
+            }
+          }
         }
-        totalTaxV2{
-          currencyCode
-          amount
+  
+        appliedGiftCards {
+          id
+          amountUsed {
+            amount
+            currencyCode
+          }
+          balance {
+            amount
+            currencyCode
+          }
         }
-        updatedAt
-        webUrl
+      }
+      userErrors {
+        field
+        message
+        code
       }
     }
   }`
   const payload = {
-    lineItems: lineItemsToAdd,
+    lines: linesToAdd,
     country: getCountry(context),
-    checkoutId: currentCart.id
+    cartId: currentCart.id // .split('?')[0]
   }
 
-  const { checkoutLineItemsAdd } = context.extendQuery(
+  const { cartLinesAdd } = context.extendQuery(
     customQuery,
     {
-      checkoutLineItemsAdd: {
+      cartLinesAdd: {
         mutation: DEFAULT_MUTATION,
         payload
       }
@@ -166,18 +150,29 @@ export async function addToCart(context, params, _customQuery?: CustomQuery) {
   )
 
   return await context.client.apolloClient.mutate({
-    mutation: checkoutLineItemsAdd.mutation,
-    variables: checkoutLineItemsAdd.payload
+    mutation: cartLinesAdd.mutation,
+    variables: cartLinesAdd.payload,
+    fetchPolicy: 'no-cache'
   }).then((result) => {
-    const discountApplications = result.data.checkoutLineItemsAdd.checkout.discountApplications.edges.map((discountApplications => discountApplications.node));
-      const lineItems = result.data.checkoutLineItemsAdd.checkout.lineItems.edges.map((lineItem => lineItem.node));
-      delete (result.data.checkoutLineItemsAdd.checkout.lineItems);
-      delete (result.data.checkoutLineItemsAdd.checkout.discountApplications);
-      result.data.checkoutLineItemsAdd.checkout = {
-          ...result.data.checkoutLineItemsAdd.checkout,
-          discountApplications,
-          lineItems
-      };
-    return result.data.checkoutLineItemsAdd.checkout;
+
+    const cartData = result.data.cartLinesAdd.cart;
+
+    // Extract discount codes
+    const discountCodes = (cartData.discountCodes || []).map(discount => ({
+      code: discount.code,
+      applicable: discount.applicable
+    }));
+
+    // Extract line items
+    const lines = (cartData.lines.edges || []).map(edge => edge.node);
+
+    // Clean up and structure the final cart object
+    const finalCart = {
+      ...cartData,
+      discountCodes,
+      lines
+    };
+
+    return finalCart;
   });
 }

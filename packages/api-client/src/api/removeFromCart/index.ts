@@ -4,160 +4,146 @@ import { getCountry } from '../../helpers/utils';
 export async function removeFromCart(context, params, _customQuery?: CustomQuery) {
   const { currentCart, product } = params;
   // products to be remove
-  const lineItemIdsToRemove = [
-    product.id
-  ];
+  const lineItemIdsToRemove = currentCart.lines.edges
+    .filter((line) => line.node.merchandise.id === product.variantBySelectedOptions?.id || line.node.merchandise.id === product.id)
+    .map((line) => line.node.id);
 
-  const DEFAULT_MUTATION = `mutation checkoutLineItemsRemove($country:CountryCode, $checkoutId: ID!, $lineItemIds: [ID!]!) @inContext(country:$country){
-  checkoutLineItemsRemove(checkoutId: $checkoutId, lineItemIds: $lineItemIds){
-    checkout{
-      appliedGiftCards{
-          id
-          amountUsedV2{
-            currencyCode
-            amount
-          }
-          balanceV2{
-            currencyCode
-            amount
-          }
-          
-        }
-        completedAt
+  const DEFAULT_MUTATION = `mutation cartLinesRemove($country: CountryCode, $cartId: ID!, $lineIds: [ID!]!) @inContext(country: $country) {
+    cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+      cart {
+        id
+        checkoutUrl
         createdAt
-        currencyCode
-        customAttributes{
+        updatedAt
+        note
+  
+        appliedGiftCards {
+          id
+          amountUsed {
+            amount
+            currencyCode
+          }
+          balance {
+            amount
+            currencyCode
+          }
+        }
+  
+        attributes {
           key
           value
         }
-        discountApplications(first:20){
-          edges{
-            node{
-              ... on DiscountCodeApplication {
-                code
-                allocationMethod
-                targetType
-                targetSelection
-                value{
-                  ... on MoneyV2{
-                    amount
-                    currencyCode
-                  }
-                  ... on PricingPercentageValue{
-                    percentage
-                  }
-                }
-              }
-            }
-          }
+  
+        discountCodes {
+          code
+          applicable
         }
-        email
-        id
-        lineItems(first:250){
-          edges{
-            node{
-              customAttributes{
+  
+        lines(first: 250) {
+          edges {
+            node {
+              id
+              quantity
+              attributes {
                 key
                 value
               }
-              id
-              quantity
-              title
-              variant{
-                availableForSale
-                compareAtPriceV2{
-                  currencyCode
-                  amount
-                }
-                id
-                image{
-                  altText
+              merchandise {
+                ... on ProductVariant {
                   id
-                  height
-                  width
-                  src
-                }
-                priceV2{
-                  currencyCode
-                  amount
-                }
-                compareAtPriceV2{
-                  currencyCode
-                  amount
-                }
-                product{
-                  handle
-                  id
-                }
-                selectedOptions{
-                  name
-                  value
-                }
-                sku
-                title
-                unitPrice{
-                  currencyCode
-                  amount
+                  title
+                  availableForSale
+                  price {
+                    amount
+                    currencyCode
+                  }
+                  compareAtPrice {
+                    amount
+                    currencyCode
+                  }
+                  unitPrice {
+                    amount
+                    currencyCode
+                  }
+                  image {
+                    altText
+                    id
+                    height
+                    width
+                    src
+                  }
+                  product {
+                    handle
+                    id
+                  }
+                  selectedOptions {
+                    name
+                    value
+                  }
+                  sku
                 }
               }
             }
           }
         }
-        lineItemsSubtotalPrice{
-          currencyCode
-          amount
+  
+        estimatedCost {
+          subtotalAmount {
+            amount
+            currencyCode
+          }
+          totalAmount {
+            amount
+            currencyCode
+          }
+          totalTaxAmount {
+            amount
+            currencyCode
+          }
         }
-        note
-        order {
-          id
+  
+        deliveryGroups {
+          edges {
+            node {
+              deliveryMethods {
+                handle
+                title
+                price {
+                  amount
+                  currencyCode
+                }
+              }
+            }
+          }
         }
-        orderStatusUrl
-        paymentDueV2{
-          currencyCode
-          amount
-        }
-        ready
-        requiresShipping
+  
         shippingAddress {
           id
         }
-        shippingLine{
-          handle
-          priceV2{
-            currencyCode
-            amount
-          }
-          title
+  
+        buyerIdentity {
+          email
+          countryCode
         }
-        subtotalPriceV2{
-          currencyCode
-          amount
-        }
-        taxExempt
-        taxesIncluded
-        totalPriceV2{
-          currencyCode
-          amount
-        }
-        totalTaxV2{
-          currencyCode
-          amount
-        }
-        updatedAt
-        webUrl
+  
+      }
+      userErrors {
+        field
+        message
+        code
       }
     }
   }`
   const payload = {
-    lineItemIds: lineItemIdsToRemove,
+    lineIds: lineItemIdsToRemove,
     country: getCountry(context),
-    checkoutId: currentCart.id
-  }
+    cartId: currentCart.id,
+  };
 
-    const { checkoutLineItemsRemove } = context.extendQuery(
+    const { cartLinesRemove } = context.extendQuery(
       _customQuery,
       {
-        checkoutLineItemsRemove: {
+        cartLinesRemove: {
           mutation: DEFAULT_MUTATION,
           payload
         }
@@ -166,18 +152,25 @@ export async function removeFromCart(context, params, _customQuery?: CustomQuery
 
 
   return await context.client.apolloClient.mutate({
-    mutation: gql(checkoutLineItemsRemove.mutation) as any,
-    variables: checkoutLineItemsRemove.payload
+    mutation: gql(cartLinesRemove.mutation) as any,
+    variables: cartLinesRemove.payload,
   }).then((result) => {
-    const discountApplications = result.data.checkoutLineItemsRemove.checkout.discountApplications.edges.map((discountApplications => discountApplications.node));
-      const lineItems = result.data.checkoutLineItemsRemove.checkout.lineItems.edges.map((lineItem => lineItem.node));
-      delete (result.data.checkoutLineItemsRemove.checkout.lineItems);
-      delete (result.data.checkoutLineItemsRemove.checkout.discountApplications);
-      result.data.checkoutLineItemsRemove.checkout = {
-          ...result.data.checkoutLineItemsRemove.checkout,
-          discountApplications,
-          lineItems
-      };
-    return result.data.checkoutLineItemsRemove.checkout;
+    const cartData = result.data.cartLinesRemove.cart;
+
+    // Extract discount codes
+    const discountCodes = cartData.discountCodes?.map((discount) => ({
+      code: discount.code,
+      applicable: discount.applicable,
+    })) || [];
+
+    // Extract line items
+    const lines = cartData.lines.edges?.map((edge) => edge.node) || [];
+
+    // Return the structured cart data
+    return {
+      ...cartData,
+      discountCodes,
+      lines,
+    };
   });
 }

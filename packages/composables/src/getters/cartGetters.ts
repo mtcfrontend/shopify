@@ -4,7 +4,7 @@ import { Cart, LineItem } from '@vue-storefront/shopify-api/src/types';
 import { formatSelectedAttributeList } from './_utils';
 
 export const getCartItems = (cart: Cart): LineItem[] => {
-  return cart.lineItems;
+  return cart.lines;
 };
 
 export const getCartItemName = (product: any): string => product?.title || 'Product\'s name';
@@ -60,11 +60,11 @@ export const getCartTotals = (cart): AgnosticTotals => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getCartShippingPrice = (cart: Cart): number => 0;
 
-export const getCartSubTotal = (cart: Cart): number => cart.lineItemsSubtotalPrice || 0;
+export const getCartSubTotal = (cart: Cart): number => cart.linesSubtotalPrice || 0;
 
-export const getcheckoutURL = (cart: Cart): string => cart.webUrl || '';
+export const getcheckoutURL = (cart: Cart): string => cart.checkoutUrl || '';
 
-export const getCartTotalItems = (cart: Cart): number => cart?.lineItems?.length > 0 ? cart.lineItems.reduce((n, { quantity }) => n + quantity, 0):0;
+export const getCartTotalItems = (cart: Cart): number => cart?.lines?.length > 0 ? cart.lines.reduce((n, { quantity }) => n + quantity, 0):0;
 
 export const getCartTotalDiscount = (cart: Cart): number => cart?.discountApplications.length > 0? cart.discountApplications[0].value : 0;
 

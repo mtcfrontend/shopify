@@ -6,183 +6,181 @@ import { getCountry } from '../../helpers/utils';
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default async function updateCart(context, params, _customQuery?: CustomQuery) {
   const { currentCart, product, quantity } = params;
-  // Existing Checkout ID
-  const lineItemsToUpdate = [{
-    id: product.id,
-    quantity
-  }];
+
+// Find the correct cart line ID using the product's variant ID
+  const lineItem = currentCart.lines.edges.find(
+    (line) => line.node.merchandise.id === product.variantBySelectedOptions?.id || line.node.merchandise.id === product.id
+  );
+
+  const linesToUpdate = lineItem
+    ? [{
+      id: lineItem.node.id, // Correct cart line ID
+      quantity
+    }]
+    : [];
 
 
-  const DEFAULT_MUTATION = gql`mutation checkoutLineItemsUpdate($country:CountryCode, $checkoutId: ID!, $lineItems: [CheckoutLineItemUpdateInput!]! ) @inContext(country:$country){
-  checkoutLineItemsUpdate(checkoutId: $checkoutId, lineItems: $lineItems){
-    checkout{
-      appliedGiftCards{
-          id
-          amountUsedV2{
-            currencyCode
-            amount
-          }
-          balanceV2{
-            currencyCode
-            amount
-          }
-          
-        }
-        completedAt
+  const DEFAULT_MUTATION = gql`mutation cartLinesUpdate($country: CountryCode, $cartId: ID!, $lines: [CartLineUpdateInput!]!) @inContext(country: $country) {
+    cartLinesUpdate(cartId: $cartId, lines: $lines) {
+      cart {
+        id
+        checkoutUrl
         createdAt
-        currencyCode
-        customAttributes{
+        updatedAt
+        note
+  
+        appliedGiftCards {
+          id
+          amountUsed {
+            amount
+            currencyCode
+          }
+          balance {
+            amount
+            currencyCode
+          }
+        }
+  
+        attributes {
           key
           value
         }
-        discountApplications(first:20){
-          edges{
-            node{
-              ... on DiscountCodeApplication {
-                code
-                allocationMethod
-                targetType
-                targetSelection
-                value{
-                  ... on MoneyV2{
-                    amount
-                    currencyCode
-                  }
-                  ... on PricingPercentageValue{
-                    percentage
-                  }
-                }
-              }
-            }
-          }
+  
+        discountCodes {
+          code
+          applicable
         }
-        email
-        id
-        lineItems(first:250){
-          edges{
-            node{
-              customAttributes{
+  
+        lines(first: 250) {
+          edges {
+            node {
+              id
+              quantity
+              attributes {
                 key
                 value
               }
-              id
-              quantity
-              title
-              variant{
-                availableForSale
-                compareAtPriceV2{
-                  currencyCode
-                  amount
-                }
-                id
-                image{
-                  altText
+              merchandise {
+                ... on ProductVariant {
                   id
-                  height
-                  width
-                  src
-                }
-                priceV2{
-                  currencyCode
-                  amount
-                }
-                compareAtPriceV2{
-                  currencyCode
-                  amount
-                }
-                product{
-                  handle
-                  id
-                }
-                selectedOptions{
-                  name
-                  value
-                }
-                sku
-                title
-                unitPrice{
-                  currencyCode
-                  amount
+                  title
+                  availableForSale
+                  price {
+                    amount
+                    currencyCode
+                  }
+                  compareAtPrice {
+                    amount
+                    currencyCode
+                  }
+                  unitPrice {
+                    amount
+                    currencyCode
+                  }
+                  image {
+                    altText
+                    id
+                    height
+                    width
+                    src
+                  }
+                  product {
+                    handle
+                    id
+                  }
+                  selectedOptions {
+                    name
+                    value
+                  }
+                  sku
                 }
               }
             }
           }
         }
-        lineItemsSubtotalPrice{
-          currencyCode
-          amount
+  
+        estimatedCost {
+          subtotalAmount {
+            amount
+            currencyCode
+          }
+          totalAmount {
+            amount
+            currencyCode
+          }
+          totalTaxAmount {
+            amount
+            currencyCode
+          }
         }
-        note
-        order {
-          id
+  
+        deliveryGroups {
+          edges {
+            node {
+              deliveryMethods {
+                handle
+                title
+                price {
+                  amount
+                  currencyCode
+                }
+              }
+            }
+          }
         }
-        orderStatusUrl
-        paymentDueV2{
-          currencyCode
-          amount
-        }
-        ready
-        requiresShipping
+  
         shippingAddress {
           id
         }
-        shippingLine{
-          handle
-          priceV2{
-            currencyCode
-            amount
-          }
-          title
+  
+        buyerIdentity {
+          email
+          countryCode
         }
-        subtotalPriceV2{
-          currencyCode
-          amount
-        }
-        taxExempt
-        taxesIncluded
-        totalPriceV2{
-          currencyCode
-          amount
-        }
-        totalTaxV2{
-          currencyCode
-          amount
-        }
-        updatedAt
-        webUrl
+      }
+      userErrors {
+        field
+        message
+        code
       }
     }
   }`
   const payload = {
-    lineItems: lineItemsToUpdate,
+    lines: linesToUpdate,
     country: getCountry(context),
-    checkoutId: currentCart.id
+    cartId: currentCart.id
   }
 
-    const { checkoutLineItemsUpdate } = context.extendQuery(
-      _customQuery,
-      {
-        checkoutLineItemsUpdate: {
-          mutation: print(DEFAULT_MUTATION as any),
-          payload
-        }
-      }
-    )
-
+  const { cartLinesUpdate } = context.extendQuery(
+    _customQuery,
+    {
+      cartLinesUpdate: {
+        mutation: print(DEFAULT_MUTATION as any),
+        payload,
+      },
+    }
+  );
 
   return await context.client.apolloClient.mutate({
-    mutation: gql(checkoutLineItemsUpdate.mutation) as any,
-    variables: checkoutLineItemsUpdate.payload
+    mutation: gql(cartLinesUpdate.mutation) as any,
+    variables: cartLinesUpdate.payload,
   }).then((result) => {
-    const discountApplications = result.data.checkoutLineItemsUpdate.checkout.discountApplications.edges.map((discountApplications => discountApplications.node));
-      const lineItems = result.data.checkoutLineItemsUpdate.checkout.lineItems.edges.map((lineItem => lineItem.node));
-      delete (result.data.checkoutLineItemsUpdate.checkout.lineItems);
-      delete (result.data.checkoutLineItemsUpdate.checkout.discountApplications);
-      result.data.checkoutLineItemsUpdate.checkout = {
-          ...result.data.checkoutLineItemsUpdate.checkout,
-          discountApplications,
-          lineItems
-      };
-    return result.data.checkoutLineItemsUpdate.checkout;
+    const cartData = result.data.cartLinesUpdate.cart;
+
+    // Extract discount codes
+    const discountCodes = cartData.discountCodes?.map((discount) => ({
+      code: discount.code,
+      applicable: discount.applicable,
+    })) || [];
+
+    // Extract updated line items
+    const lines = cartData.lines.edges?.map((edge) => edge.node) || [];
+
+    // Return the structured result
+    return {
+      ...cartData,
+      discountCodes,
+      lines,
+    };
   });
 }

@@ -55,42 +55,141 @@ type Scalars = {
 };
 export type Cart = {
   __typename?: 'Cart';
-  appliedGiftCards: Maybe<Scalars['Array']>;
-  completedAt: Maybe<Scalars['String']>;
-  code?: Maybe<Scalars['String']>;
-  checkoutUserErrors?: Maybe<Scalars['Array']>;
-  createdAt: Maybe<Scalars['String']>;
-  currencyCode: Maybe<Scalars['String']>;
-  customAttributes: Maybe<Scalars['Array']>;
-  discountApplications: Maybe<Scalars['Array']>;
-  email: Maybe<Scalars['String']>;
-  errors: Maybe<Scalars['Json']>;
   id: Maybe<Scalars['String']>;
-  lineItems?: Maybe<Scalars['Array']>;
-  lineItemsSubtotalPrice?: Maybe<Scalars['Json']>;
-  note?: Maybe<Scalars['String']>;
-  order?: Maybe<Scalars['String']>;
-  orderStatusUrl?: Maybe<Scalars['String']>;
-  paymentDue?: Maybe<Scalars['String']>;
-  ready?: Maybe<Scalars['String']>;
-  requiresShipping?: Maybe<Scalars['String']>;
-  shippingAddress?: Maybe<Scalars['Json']>;
-  shippingLine?: Maybe<Scalars['String']>;
-  subtotalPrice?: Maybe<Scalars['String']>;
-  taxExempt?: Maybe<Scalars['String']>;
-  taxesIncluded?: Maybe<Scalars['String']>;
-  totalPrice?: Maybe<Scalars['String']>;
-  totalTax?: Maybe<Scalars['String']>;
+  checkoutUrl?: Maybe<Scalars['String']>;
+  createdAt: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
-  userErrors?: Maybe<Scalars['Array']>;
-  webUrl?: Maybe<Scalars['String']>;
-}
+  note?: Maybe<Scalars['String']>;
+
+  appliedGiftCards: Maybe<Array<{
+    id: string;
+    amountUsed: {
+      amount: string;
+      currencyCode: string;
+    };
+    balance: {
+      amount: string;
+      currencyCode: string;
+    };
+  }>>;
+
+  attributes: Maybe<Array<{
+    key: string;
+    value: string;
+  }>>;
+
+  discountCodes: Maybe<Array<{
+    code: string;
+    applicable: boolean;
+  }>>;
+
+  lines: Maybe<Array<{
+    id: string;
+    quantity: number;
+    attributes?: Maybe<Array<{
+      key: string;
+      value: string;
+    }>>;
+    merchandise: {
+      id: string;
+      title: string;
+      availableForSale: boolean;
+      price: {
+        amount: string;
+        currencyCode: string;
+      };
+      compareAtPrice?: {
+        amount: string;
+        currencyCode: string;
+      };
+      product: {
+        handle: string;
+        id: string;
+      };
+      selectedOptions?: Maybe<Array<{
+        name: string;
+        value: string;
+      }>>;
+    };
+  }>>;
+
+  estimatedCost?: Maybe<{
+    subtotalAmount: {
+      amount: string;
+      currencyCode: string;
+    };
+    totalAmount: {
+      amount: string;
+      currencyCode: string;
+    };
+    totalTaxAmount?: Maybe<{
+      amount: string;
+      currencyCode: string;
+    }>;
+  }>;
+
+  deliveryGroups?: Maybe<Array<{
+    deliveryMethods: Array<{
+      handle: string;
+      title: string;
+      price: {
+        amount: string;
+        currencyCode: string;
+      };
+    }>;
+  }>>;
+
+  shippingAddress?: Maybe<Scalars['Json']>;
+
+  buyerIdentity?: Maybe<{
+    email?: Maybe<Scalars['String']>;
+    countryCode?: Maybe<Scalars['String']>;
+  }>;
+
+  userErrors?: Maybe<Array<{
+    field?: Maybe<Array<Scalars['String']>>;
+    message: string;
+    code?: Maybe<string>;
+  }>>;
+};
 
 export type CartItem = {
   __typename?: 'CartItem';
   id: Maybe<Scalars['String']>;
-  variant?: Maybe<Scalars['Array']>;
-}
+  quantity: number;
+  attributes?: Maybe<Array<{
+    key: string;
+    value: string;
+  }>>;
+  merchandise?: Maybe<{
+    id: string;
+    title: string;
+    sku?: string;
+    availableForSale: boolean;
+    price: {
+      amount: string;
+      currencyCode: string;
+    };
+    compareAtPrice?: {
+      amount: string;
+      currencyCode: string;
+    };
+    product: {
+      id: string;
+      handle: string;
+    };
+    selectedOptions?: Maybe<Array<{
+      name: string;
+      value: string;
+    }>>;
+    image?: Maybe<{
+      altText?: string;
+      src: string;
+      width?: number;
+      height?: number;
+    }>;
+  }>;
+};
 export type Wishlist = {}
 export type ProductVariant = {
   __typename?: 'ProductVariant';

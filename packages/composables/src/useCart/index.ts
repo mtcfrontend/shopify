@@ -21,23 +21,23 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
     let existngCartId = app.$cookies.get(appKey + '_cart_id');
     if ((existngCartId === undefined || existngCartId === '' || isLocaleSwitched)) {
       // Initiate new cart
-      existngCartId = await context.$shopify.api.createCart().then((checkout) => {
-        app.$cookies.set(appKey + '_cart_id', checkout.id, {maxAge: 60 * 60 * 24 * 365, path: '/'});
-        return checkout.id;
+      existngCartId = await context.$shopify.api.createCart().then((cart) => {
+        app.$cookies.set(appKey + '_cart_id', cart.id, {maxAge: 60 * 60 * 24 * 365, path: '/'});
+        return cart.id;
       });
     }
-    const checkoutId = existngCartId;
+    const cartId = existngCartId;
     // Keep existing cart
-    const plainResp = await context.$shopify.api.checkOut(checkoutId).then(async(checkout) => {
-      // Do something with the checkout
-      if(checkout.orderStatusUrl !== null){
-        const resetCheckout = await context.$shopify.api.createCart().then((checkout) => {
-            return checkout;
+    const plainResp = await context.$shopify.api.checkOut(cartId).then(async(cart) => {
+      // Do something with the cart
+      if(cart.orderStatusUrl !== null){
+        const resetCheckout = await context.$shopify.api.createCart().then((cart) => {
+            return cart;
         });
         app.$cookies.set(appKey + '_cart_id', resetCheckout.id, {maxAge: 60 * 60 * 24 * 365, path: '/'});
         return resetCheckout;
       }else {
-        return checkout;
+        return cart;
       }
     });
     return JSON.parse(JSON.stringify(plainResp));
@@ -47,30 +47,30 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
   addItem: async (context: Context, { currentCart, product, quantity, customQuery }) => {
     const app = context.$shopify.config.app;
     const appKey = app.$config.appKey;
-    return await context.$shopify.api.addToCart({ currentCart, product, quantity, customQuery }).then((checkout) => {
+    return await context.$shopify.api.addToCart({ currentCart, product, quantity, customQuery }).then((cart) => {
       // store cart id
       if (!app.$cookies.get(appKey + '_cart_id', currentCart.id)) {
         app.$cookies.set(appKey + '_cart_id', currentCart.id, { maxAge: 60 * 60 * 24 * 365, path: '/' });  
       }
-      return JSON.parse(JSON.stringify(checkout));
+      return JSON.parse(JSON.stringify(cart));
     });
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   removeItem: async (context: Context, { currentCart, product, customQuery }) => {
-    // Remove an item from the checkout
-    return await context.$shopify.api.removeFromCart({currentCart, product}).then((checkout) => {
+    // Remove an item from the cart
+    return await context.$shopify.api.removeFromCart({currentCart, product}).then((cart) => {
       // return updated cart data
-      return JSON.parse(JSON.stringify(checkout));
+      return JSON.parse(JSON.stringify(cart));
     });
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   updateItemQty: async (context: Context, { currentCart, product, quantity, customQuery }) => {
     // Update an item Quantity
-    return await context.$shopify.api.updateCart({currentCart, product, quantity}).then((checkout) => {
+    return await context.$shopify.api.updateCart({currentCart, product, quantity}).then((cart) => {
       // return updated cart data
-      return JSON.parse(JSON.stringify(checkout));
+      return JSON.parse(JSON.stringify(cart));
     });
   },
 
@@ -84,7 +84,7 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
     return await context.$shopify.api.applyCoupon({ currentCart, couponCode, customQuery }).then((checkout) => {
       // return updated checkout data
       return {
-        updatedCart: JSON.parse(JSON.stringify(checkout.checkout))
+        updatedCart: JSON.parse(JSON.stringify(checkout.cart))
       };
     });
   },
@@ -116,7 +116,7 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
           const buff = Buffer.from(variationIDPlain);
           variantId = buff.toString('base64');
         }
-          return currentCart?.lineItems?.find?.((item) => item.variant.id === variantId);
+          return currentCart?.lines?.find?.((item) => item.variant.id === variantId);
 
       }
       return false;

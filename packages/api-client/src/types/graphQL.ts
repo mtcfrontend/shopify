@@ -618,7 +618,7 @@ export type Cart = Versioned & {
   customer?: Maybe<Customer>;
   customerEmail?: Maybe<Scalars['String']>;
   anonymousId?: Maybe<Scalars['String']>;
-  lineItems: Array<LineItem>;
+  lines: Array<LineItem>;
   customLineItems: Array<CustomLineItem>;
   totalPrice: Money;
   taxedPrice?: Maybe<TaxedPrice>;
@@ -850,7 +850,7 @@ export type CartDraft = {
   deleteDaysAfterLastModification?: Maybe<Scalars['Int']>;
   itemShippingAddresses?: Maybe<Array<AddressInput>>;
   discountCodes?: Maybe<Array<Scalars['String']>>;
-  lineItems?: Maybe<Array<LineItemDraft>>;
+  lines?: Maybe<Array<LineItemDraft>>;
   customLineItems?: Maybe<Array<CustomLineItemDraft>>;
   customerId?: Maybe<Scalars['String']>;
   externalTaxRateForShippingMethod?: Maybe<ExternalTaxRateDraft>;
@@ -3952,7 +3952,7 @@ export type MyCartDraft = {
   deleteDaysAfterLastModification?: Maybe<Scalars['Int']>;
   itemShippingAddresses?: Maybe<Array<AddressInput>>;
   discountCodes?: Maybe<Array<Scalars['String']>>;
-  lineItems?: Maybe<Array<MyLineItemDraft>>;
+  lines?: Maybe<Array<MyLineItemDraft>>;
 };
 
 export type MyCartUpdateAction = {

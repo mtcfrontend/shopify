@@ -22,20 +22,28 @@ import {
 } from './graphQL';
 
 export interface ApiInstance {
-  addToCart ({ id, version }: Cart, product: ProductVariant, quantity: number, customQuery?: CustomQueryFn);
+  addToCart(
+    cart: Cart,
+    product: ProductVariant,
+    quantity: number,
+    customQuery?: CustomQueryFn
+  ): Promise<{ data: Cart }>;
   // applyCartCoupon (cart: Cart, discountCode: string, customQuery?: CustomQueryFn): Promise<CartResponse>;
-  createCart (cartDraft?: CartData, customQueryFn?: CustomQueryFn): Promise<{ data: CartQueryInterface }>;
+  createCart(
+    cartDraft?: CartData,
+    customQueryFn?: CustomQueryFn
+  ): Promise<{ data: CartQueryInterface }>;
   // createMyOrderFromCart (draft: OrderMyCartCommand, customQueryFn?: CustomQueryFn): Promise<OrderMutationResponse>;
   // customerChangeMyPassword (version: any, currentPassword: string, newPassword: string): Promise<ChangeMyPasswordResponse>;
   // customerSignMeIn (draft: CustomerSignMeInDraft): Promise<SignInResponse>;
   // customerSignMeUp (draft: CustomerSignMeUpDraft): Promise<SignInResponse>;
   // customerSignOut (): Promise<void>;
   // customerUpdateMe (currentUser, updatedUserData): Promise<any>;
-  getCart(cartId: string);
-  getCategory(params, customQueryFn?: CustomQueryFn);
+  getCart(cartId: string): Promise<{ data: Cart }>;
+  getCategory(params, customQueryFn?: CustomQueryFn): Promise<any>;
   getMe (params?: GetMeParams, customQueryFn?: CustomQueryFn);
   // getOrders (params, customQueryFn?: CustomQueryFn): Promise<{ data: { me: Me } }>;
-  getProduct (params, customQueryFn?: CustomQueryFn);
+  getProduct(params, customQueryFn?: CustomQueryFn): Promise<{ data: ProductVariant }>;
   // getShippingMethods (cartId?: string, customQueryFn?: CustomQueryFn): Promise<ShippingMethodData>;
   // removeCartCoupon (cart: Cart, discountCode: ReferenceInput, customQuery?: CustomQueryFn): Promise<CartResponse>;
   // removeFromCart (cart: Cart, product: LineItem, customQuery?: CustomQueryFn): Promise<CartResponse>;
