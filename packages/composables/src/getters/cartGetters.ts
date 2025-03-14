@@ -4,19 +4,22 @@ import { Cart, LineItem } from '@vue-storefront/shopify-api/src/types';
 import { formatSelectedAttributeList } from './_utils';
 
 export const getCartItems = (cart: Cart): LineItem[] => {
-  return cart.lines;
+  return cart?.lines?.map((lineItem) => ({
+    ...lineItem,
+    variant: lineItem.merchandise, // Duplicates the 'merchandise' as 'variant' as a fallback
+  })) || [];
 };
 
-export const getCartItemName = (product: any): string => product?.title || 'Product\'s name';
+export const getCartItemName = (product: any): string => product?.title || (product?.merchandise?.product?.title || 'Product\'s name');
 export const getCartItemId = (product: any): string => product.id || '0';
 export const getCartItemSlug = (product: any): string => {
   return product.slug || '0';
 };
 
 export const getCartItemImage = (product: any): string => {
-  if (product.variant && product?.variant?.image !== null) {
-    const imgPath = product?.variant?.image?.src.substring(0, product?.variant.image.src.lastIndexOf('.'));
-    const imgext = product?.variant?.image?.src.split('.').pop();
+  if (product.merchandise && product?.merchandise?.image !== null) {
+    const imgPath = product?.merchandise?.image?.src.substring(0, product?.merchandise.image.src.lastIndexOf('.'));
+    const imgext = product?.merchandise?.image?.src.split('.').pop();
     const cartImg = imgPath + '_120x120.' + imgext;
     return cartImg;
   }
@@ -25,8 +28,8 @@ export const getCartItemImage = (product: any): string => {
 
 export const getCartItemPrice = (product: any): AgnosticPrice => {
   return {
-    regular: product?.variant?.compareAtPriceV2?.amount || null,
-    special: product?.variant?.priceV2?.amount || null
+    regular: product?.merchandise?.compareAtPrice?.amount || null,
+    special: product?.merchandise?.price?.amount || null
   };
 };
 
@@ -34,7 +37,7 @@ export const getCartItemPrice = (product: any): AgnosticPrice => {
 export const getCartItemQty = (product: LineItem): number => product?.quantity;
 
 export const getCartItemAttributes = (product: LineItem) => {
-  const formatAttedattributeList = formatSelectedAttributeList(product?.variant.selectedOptions);
+  const formatAttedattributeList = formatSelectedAttributeList(product?.merchandise.selectedOptions);
   if (formatAttedattributeList.length) {
     const attribArr = [];
     formatAttedattributeList.forEach((attr) => {
@@ -45,30 +48,47 @@ export const getCartItemAttributes = (product: LineItem) => {
   return {};
 };
 
-export const getCartItemSku = (product: any): string => product?.variant.sku || '-';
+export const getCartItemSku = (product: any): string => product?.merchandise.sku || '-';
 
-export const getCartTotals = (cart): AgnosticTotals => {
-  if (cart && cart !== null) {
+export const getCartTotals = (cart: Cart | null): AgnosticTotals => {
+  if (!cart) {
     return {
-      total: parseFloat(cart.totalPriceV2?.amount),
-      subtotal: parseFloat(cart.subtotalPriceV2?.amount),
-      special: parseFloat(cart.subtotalPriceV2?.amount),
+      total: 0,
+      subtotal: 0,
+      special: 0,
     };
   }
+
+  return {
+    total: parseFloat(cart.estimatedCost?.totalAmount?.amount || '0'),
+    subtotal: parseFloat(cart.estimatedCost?.subtotalAmount?.amount || '0'),
+    special: parseFloat(cart.estimatedCost?.subtotalAmount?.amount || '0'), // Change if "special" has a unique meaning
+  };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getCartShippingPrice = (cart: Cart): number => 0;
 
-export const getCartSubTotal = (cart: Cart): number => cart.linesSubtotalPrice || 0;
+export const getCartSubTotal = (cart: Cart): { amount: number; currencyCode: string } => {
+  return {
+    amount: parseFloat(cart?.estimatedCost?.subtotalAmount?.amount || '0'),
+    currencyCode: cart?.estimatedCost?.subtotalAmount?.currencyCode || 'USD',
+  };
+};
 
 export const getcheckoutURL = (cart: Cart): string => cart.checkoutUrl || '';
 
 export const getCartTotalItems = (cart: Cart): number => cart?.lines?.length > 0 ? cart.lines.reduce((n, { quantity }) => n + quantity, 0):0;
 
-export const getCartTotalDiscount = (cart: Cart): number => cart?.discountApplications.length > 0? cart.discountApplications[0].value : 0;
+export const getCartTotalDiscount = (cart: Cart): number => {
+  return cart?.discountCodes?.filter(code => code.applicable)?.length || 0;
+};
 
-export const getAppliedCoupon = (cart: Cart): string => cart?.discountApplications.length > 0 ? cart.discountApplications[0].code : '';
+export const getAppliedCoupons = (cart: Cart): string[] => {
+  return cart?.discountCodes
+    ?.filter(code => code.applicable)
+    .map(code => code.code) || [];
+};
 
 export const getFormattedPrice = (price: number) => String(price);
 
@@ -95,7 +115,7 @@ const cartGetters: CartGetters<Cart, LineItem> = {
   getTotalDiscount:getCartTotalDiscount,
   getcheckoutURL,
   getSubTotal: getCartSubTotal,
-  getCoupon: getAppliedCoupon,
+  getCoupon: getAppliedCoupons,
   getCoupons,
   getDiscounts
 };

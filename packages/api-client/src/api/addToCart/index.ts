@@ -1,6 +1,5 @@
 import { CustomQuery } from '@vue-storefront/core';
 import { gql } from '@apollo/client/core'
-import { getCountry } from '../../helpers/utils'
 export async function addToCart(context, params, _customQuery?: CustomQuery) {
   const { currentCart, product, quantity, customQuery } = params;
   // Items to be add to cart
@@ -10,13 +9,11 @@ export async function addToCart(context, params, _customQuery?: CustomQuery) {
         ? product.variantBySelectedOptions.id
         : product.variantId,
       quantity,
-      attributes: customQuery.map(({ key, value }) => ({
-        key,
-        value
-      }))
+      attributes: customQuery
     }
   ];
-  const DEFAULT_MUTATION = gql`mutation cartLinesAdd($country: CountryCode, $cartId: ID!, $lines: [CartLineInput!]!) @inContext(country: $country) {
+
+  const DEFAULT_MUTATION = gql`mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
     cartLinesAdd(cartId: $cartId, lines: $lines) {
       cart {
         id
@@ -63,6 +60,7 @@ export async function addToCart(context, params, _customQuery?: CustomQuery) {
                   product {
                     id
                     handle
+                    title
                   }
                   selectedOptions {
                     name
@@ -99,16 +97,16 @@ export async function addToCart(context, params, _customQuery?: CustomQuery) {
           value
         }
   
-        deliveryGroups {
+        deliveryGroups(first: 10) {
           edges {
             node {
-              deliveryMethods {
-                handle
-                title
-                price {
-                  amount
-                  currencyCode
-                }
+              deliveryOptions {
+                  handle
+                  title
+                  estimatedCost {
+                      amount
+                      currencyCode
+                  }
               }
             }
           }
@@ -135,8 +133,7 @@ export async function addToCart(context, params, _customQuery?: CustomQuery) {
   }`
   const payload = {
     lines: linesToAdd,
-    country: getCountry(context),
-    cartId: currentCart.id // .split('?')[0]
+    cartId: currentCart.id.split('?')[0]
   }
 
   const { cartLinesAdd } = context.extendQuery(
