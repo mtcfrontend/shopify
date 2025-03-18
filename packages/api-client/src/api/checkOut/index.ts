@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { CustomQuery } from '@vue-storefront/core';
 import { gql } from '@apollo/client/core'
-import { getCountry } from '../../helpers/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default async function checkOut(context, cartId, customQuery?: CustomQuery) {
-  const DEFAULT_QUERY = `query FETCH_CART($country: CountryCode!, $id: ID!) @inContext(country: $country) {
+  const DEFAULT_QUERY = `query FETCH_CART($id: ID!) {
     cart(id: $id) {
       id
       checkoutUrl
@@ -50,6 +49,7 @@ export default async function checkOut(context, cartId, customQuery?: CustomQuer
                 id
                 title
                 availableForSale
+                requiresShipping
                 sku
                 price {
                   amount
@@ -66,13 +66,14 @@ export default async function checkOut(context, cartId, customQuery?: CustomQuer
                 image {
                   altText
                   id
-                  height
-                  width
                   src
+                  width
+                  height
                 }
                 product {
-                  handle
                   id
+                  handle
+                  title
                 }
                 selectedOptions {
                   name
@@ -99,16 +100,16 @@ export default async function checkOut(context, cartId, customQuery?: CustomQuer
         }
       }
   
-      deliveryGroups {
+      deliveryGroups(first: 10) {
         edges {
           node {
-            deliveryMethods {
-              handle
-              title
-              price {
-                amount
-                currencyCode
-              }
+            deliveryOptions {
+                handle
+                title
+                estimatedCost {
+                    amount
+                    currencyCode
+                }
             }
           }
         }
@@ -118,16 +119,11 @@ export default async function checkOut(context, cartId, customQuery?: CustomQuer
         email
         countryCode
       }
-  
-      shippingAddress {
-        id
-      }
     }
   }`
 
   const payload = {
     id: cartId,
-    country: getCountry(context),
   }
 
   const { cart } = context.extendQuery(

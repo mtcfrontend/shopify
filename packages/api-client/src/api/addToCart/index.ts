@@ -133,7 +133,7 @@ export async function addToCart(context, params, _customQuery?: CustomQuery) {
   }`
   const payload = {
     lines: linesToAdd,
-    cartId: currentCart.id.split('?')[0]
+    cartId: currentCart.id// .split('?')[0]
   }
 
   const { cartLinesAdd } = context.extendQuery(

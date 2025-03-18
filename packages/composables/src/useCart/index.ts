@@ -30,14 +30,26 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
     // Keep existing cart
     const plainResp = await context.$shopify.api.checkOut(cartId).then(async(cart) => {
       // Do something with the cart
-      if(cart.orderStatusUrl !== null){
+      if (!cart.checkoutUrl) {
         const resetCheckout = await context.$shopify.api.createCart().then((cart) => {
-            return cart;
+          return {
+              ...cart,
+              lines: cart.lines?.map(line => ({
+                  ...line,
+                  variant: line.merchandise
+              }))
+          };
         });
         app.$cookies.set(appKey + '_cart_id', resetCheckout.id, {maxAge: 60 * 60 * 24 * 365, path: '/'});
         return resetCheckout;
-      }else {
-        return cart;
+      } else {
+        return {
+            ...cart,
+            lines: cart.lines?.map(line => ({
+                ...line,
+                variant: line.merchandise
+            }))
+        };
       }
     });
     return JSON.parse(JSON.stringify(plainResp));
