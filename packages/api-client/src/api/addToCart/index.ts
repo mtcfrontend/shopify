@@ -101,12 +101,12 @@ export async function addToCart(context, params, _customQuery?: CustomQuery) {
           edges {
             node {
               deliveryOptions {
-                  handle
-                  title
-                  estimatedCost {
-                      amount
-                      currencyCode
-                  }
+                handle
+                title
+                estimatedCost {
+                  amount
+                  currencyCode
+                }
               }
             }
           }

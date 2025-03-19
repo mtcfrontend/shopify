@@ -80,9 +80,11 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   updateItemQty: async (context: Context, { currentCart, product, quantity, customQuery }) => {
     // Update an item Quantity
-    return await context.$shopify.api.updateCart({currentCart, product, quantity}).then((cart) => {
-      // return updated cart data
-      return JSON.parse(JSON.stringify(cart));
+    return await context.$shopify.api.updateCart({currentCart, product, quantity}).then((updatedCart) => {
+      if (!updatedCart || !updatedCart.lines) {
+        return "Cart update failed. No updated cart lines found.";
+      }
+      return JSON.parse(JSON.stringify(updatedCart));
     });
   },
 

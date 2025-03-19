@@ -53,6 +53,8 @@ export type Scalars = {
 
   /** Time is a scalar value that represents an ISO8601 formatted time. */
   Time: any;
+
+  URL: any;
 };
 
 export type AbsoluteDiscountValue = CartDiscountValue &

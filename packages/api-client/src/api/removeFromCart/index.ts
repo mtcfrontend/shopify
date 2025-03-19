@@ -1,44 +1,67 @@
 import { CustomQuery } from '@vue-storefront/core';
 import { gql } from '@apollo/client/core';
-import { getCountry } from '../../helpers/utils';
 export async function removeFromCart(context, params, _customQuery?: CustomQuery) {
   const { currentCart, product } = params;
   // products to be remove
-  const lineItemIdsToRemove = currentCart.lines.edges
-    .filter((line) => line.node.merchandise.id === product.variantBySelectedOptions?.id || line.node.merchandise.id === product.id)
-    .map((line) => line.node.id);
+  const lineItemIdsToRemove = [
+    product.id
+  ];
 
-  const DEFAULT_MUTATION = `mutation cartLinesRemove($country: CountryCode, $cartId: ID!, $lineIds: [ID!]!) @inContext(country: $country) {
+  const DEFAULT_MUTATION = `mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
     cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
       cart {
+        id
+        checkoutUrl
+        totalQuantity
+        lines(first: 10) {
+          edges {
+            node {
+              id
+              quantity
+              merchandise {
+                ... on ProductVariant {
+                  id
+                  title
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`
+  const payload = {
+    lineIds: lineItemIdsToRemove,
+    cartId: currentCart.id,
+  };
+
+    const { cartLinesRemove } = context.extendQuery(
+      _customQuery,
+      {
+        cartLinesRemove: {
+          mutation: DEFAULT_MUTATION,
+          payload
+        }
+      }
+    )
+
+  const result = await context.client.apolloClient.mutate({
+    mutation: gql(cartLinesRemove.mutation) as any,
+    variables: cartLinesRemove.payload,
+  });
+
+  const updatedCart = await context.client.apolloClient.query({
+    query: gql`query FETCH_CART($id: ID!) {
+      cart(id: $id) {
         id
         checkoutUrl
         createdAt
         updatedAt
         note
-  
-        appliedGiftCards {
-          id
-          amountUsed {
-            amount
-            currencyCode
-          }
-          balance {
-            amount
-            currencyCode
-          }
-        }
-  
-        attributes {
-          key
-          value
-        }
-  
         discountCodes {
           code
           applicable
         }
-  
         lines(first: 250) {
           edges {
             node {
@@ -53,6 +76,7 @@ export async function removeFromCart(context, params, _customQuery?: CustomQuery
                   id
                   title
                   availableForSale
+                  sku
                   price {
                     amount
                     currencyCode
@@ -68,25 +92,24 @@ export async function removeFromCart(context, params, _customQuery?: CustomQuery
                   image {
                     altText
                     id
-                    height
-                    width
                     src
+                    width
+                    height
                   }
                   product {
-                    handle
                     id
+                    handle
+                    title
                   }
                   selectedOptions {
                     name
                     value
                   }
-                  sku
                 }
               }
             }
           }
         }
-  
         estimatedCost {
           subtotalAmount {
             amount
@@ -101,76 +124,26 @@ export async function removeFromCart(context, params, _customQuery?: CustomQuery
             currencyCode
           }
         }
-  
-        deliveryGroups {
-          edges {
-            node {
-              deliveryMethods {
-                handle
-                title
-                price {
-                  amount
-                  currencyCode
-                }
-              }
-            }
-          }
-        }
-  
-        shippingAddress {
-          id
-        }
-  
-        buyerIdentity {
-          email
-          countryCode
-        }
-  
       }
-      userErrors {
-        field
-        message
-        code
-      }
-    }
-  }`
-  const payload = {
-    lineIds: lineItemIdsToRemove,
-    country: getCountry(context),
-    cartId: currentCart.id,
+    }`,
+    variables: { id: currentCart.id },
+    fetchPolicy: 'network-only' // Ensure fresh data
+  });
+
+  const cartData = updatedCart.data.cart;
+
+  const discountCodes = (cartData.discountCodes || []).map(discount => ({
+    code: discount.code,
+    applicable: discount.applicable
+  }));
+
+  const lines = (cartData.lines.edges || []).map(edge => edge.node);
+
+  const finalCart = {
+    ...cartData,
+    discountCodes,
+    lines
   };
 
-    const { cartLinesRemove } = context.extendQuery(
-      _customQuery,
-      {
-        cartLinesRemove: {
-          mutation: DEFAULT_MUTATION,
-          payload
-        }
-      }
-    )
-
-
-  return await context.client.apolloClient.mutate({
-    mutation: gql(cartLinesRemove.mutation) as any,
-    variables: cartLinesRemove.payload,
-  }).then((result) => {
-    const cartData = result.data.cartLinesRemove.cart;
-
-    // Extract discount codes
-    const discountCodes = cartData.discountCodes?.map((discount) => ({
-      code: discount.code,
-      applicable: discount.applicable,
-    })) || [];
-
-    // Extract line items
-    const lines = cartData.lines.edges?.map((edge) => edge.node) || [];
-
-    // Return the structured cart data
-    return {
-      ...cartData,
-      discountCodes,
-      lines,
-    };
-  });
+  return finalCart;
 }
