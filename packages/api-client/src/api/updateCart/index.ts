@@ -127,6 +127,35 @@ export default async function updateCart(context, params, _customQuery?: CustomQ
               currencyCode
             }
           }
+          attributes {
+            key
+            value
+          }
+          deliveryGroups(first: 10) {
+            edges {
+              node {
+                deliveryOptions {
+                  handle
+                  title
+                  estimatedCost {
+                    amount
+                    currencyCode
+                  }
+                }
+              }
+            }
+          }
+          appliedGiftCards {
+            id
+            amountUsed {
+              amount
+              currencyCode
+            }
+            balance {
+              amount
+              currencyCode
+            }
+          }
         }
       }
     `,
