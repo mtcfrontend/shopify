@@ -3289,56 +3289,11 @@ export type HasMetafieldsMetafieldsArgs = {
 /** Represents an image resource. */
 export type Image = {
   __typename?: 'Image';
-  /** A word or phrase to share the nature or contents of an image. */
+  id?: Maybe<string>;
+  src?:  Maybe<Scalars['URL']>;
   altText?: Maybe<Scalars['String']>;
-  /** The original height of the image in pixels. Returns `null` if the image is not hosted by Shopify. */
-  height?: Maybe<Scalars['Int']>;
-  /** A unique identifier for the image. */
-  id?: Maybe<Scalars['ID']>;
-  /**
-   * The location of the original image as a URL.
-   *
-   * If there are any existing transformations in the original source URL, they will remain and not be stripped.
-   * @deprecated Use `url` instead
-   */
-  originalSrc: Scalars['URL'];
-  /**
-   * The location of the image as a URL.
-   * @deprecated Use `url` instead
-   */
-  src: Scalars['URL'];
-  /**
-   * The location of the transformed image as a URL.
-   *
-   * All transformation arguments are considered "best-effort". If they can be applied to an image, they will be.
-   * Otherwise any transformations which an image type does not support will be ignored.
-   * @deprecated Use `url(transform:)` instead
-   */
-  transformedSrc: Scalars['URL'];
-  /**
-   * The location of the image as a URL.
-   *
-   * If no transform options are specified, then the original image will be preserved including any pre-applied transforms.
-   *
-   * All transformation options are considered "best-effort". Any transformation
-   * that the original image type doesn't support will be ignored.
-   *
-   * If you need multiple variations of the same image, then you can use [GraphQL
-   * field aliases](https://graphql.org/learn/queries/#aliases). For example:
-   *
-   * ```graphql
-   * {
-   *   ... on Image {
-   *     original: url
-   *     thumbnail: url(transform: { maxWidth: 80, maxHeight: 80 })
-   *     retina: url(transform: { scale: 2 })
-   *   }
-   * }
-   * ```
-   */
-  url: Scalars['URL'];
-  /** The original width of the image in pixels. Returns `null` if the image is not hosted by Shopify. */
   width?: Maybe<Scalars['Int']>;
+  height?: Maybe<Scalars['Int']>;
 };
 
 
@@ -5227,72 +5182,25 @@ export enum ProductSortKeys {
 }
 
 /** A product variant represents a different version of a product, such as differing sizes or differing colors. */
-export type ProductVariant = HasMetafields & Node & {
+export type ProductVariant = {
   __typename?: 'ProductVariant';
-  /** Indicates if the product variant is available for sale. */
-  availableForSale: Scalars['Boolean'];
-  /** The barcode (for example, ISBN, UPC, or GTIN) associated with the variant. */
-  barcode?: Maybe<Scalars['String']>;
-  /**
-   * The compare at price of the variant. This can be used to mark a variant as on
-   * sale, when `compareAtPrice` is higher than `price`.
-   * @deprecated Use `compareAtPriceV2` instead
-   */
-  compareAtPrice?: Maybe<Scalars['Money']>;
-  /**
-   * The compare at price of the variant. This can be used to mark a variant as on
-   * sale, when `compareAtPriceV2` is higher than `priceV2`.
-   */
-  compareAtPriceV2?: Maybe<MoneyV2>;
-  /** Whether a product is out of stock but still available for purchase (used for backorders). */
-  currentlyNotInStock: Scalars['Boolean'];
-  /** A globally-unique identifier. */
-  id: Scalars['ID'];
-  /** Image associated with the product variant. This field falls back to the product image if no image is available. */
-  image?: Maybe<Image>;
-  /** Returns a metafield found by namespace and key. */
-  metafield?: Maybe<Metafield>;
-  /**
-   * A paginated list of metafields associated with the resource.
-   * @deprecated The `metafields` field will be removed in the future in favor of using [aliases](https://graphql.org/learn/queries/#aliases) with the `metafield` field.
-   *
-   */
-  metafields: MetafieldConnection;
-  /**
-   * The product variant’s price.
-   * @deprecated Use `priceV2` instead
-   */
-  price: Scalars['Money'];
-  /** The product variant’s price. */
-  priceV2: MoneyV2;
-  /** The product object that the product variant belongs to. */
-  product: Product;
-  /** The total sellable quantity of the variant for online sales channels. */
-  quantityAvailable?: Maybe<Scalars['Int']>;
-  /** Whether a customer needs to provide a shipping address when placing an order for the product variant. */
-  requiresShipping: Scalars['Boolean'];
-  /** List of product options applied to the variant. */
-  selectedOptions: Array<SelectedOption>;
-  /**
-   * Represents an association between a variant and a selling plan. Selling plan
-   * allocations describe which selling plans are available for each variant, and
-   * what their impact is on pricing.
-   */
-  sellingPlanAllocations: SellingPlanAllocationConnection;
-  /** The SKU (stock keeping unit) associated with the variant. */
-  sku?: Maybe<Scalars['String']>;
-  /** The in-store pickup availability of this variant by location. */
-  storeAvailability: StoreAvailabilityConnection;
-  /** The product variant’s title. */
-  title: Scalars['String'];
-  /** The unit price value for the variant based on the variant's measurement. */
+  id: string;
+  title: string;
+  availableForSale: boolean;
+  requiresShipping: boolean;
+  sku?: Maybe<string>;
+  price: MoneyV2;
+  compareAtPrice?: Maybe<MoneyV2>;
   unitPrice?: Maybe<MoneyV2>;
-  /** The unit price measurement for the variant. */
-  unitPriceMeasurement?: Maybe<UnitPriceMeasurement>;
-  /** The weight of the product variant in the unit system specified with `weight_unit`. */
-  weight?: Maybe<Scalars['Float']>;
-  /** Unit of measurement for weight. */
-  weightUnit: WeightUnit;
+  image?: Maybe<Image>;
+  product: {
+    id: string;
+    handle: string;
+  };
+  selectedOptions?: Maybe<Array<{
+    name: string;
+    value: string;
+  }>>;
 };
 
 

@@ -478,59 +478,113 @@ during a customer's session, refer to the [Cart
 guide](https://shopify.dev/custom-storefronts/cart).
 """
 type Cart implements Node {
-  """
-  The attributes associated with the cart. Attributes are represented as key-value pairs.
-  """
-  attributes: [Attribute!]!
+    """
+    The attributes associated with the cart. Attributes are represented as key-value pairs.
+    """
+    attributes: [Attribute!]!
 
-  """Information about the buyer that is interacting with the cart."""
-  buyerIdentity: CartBuyerIdentity!
+    """Information about the buyer that is interacting with the cart."""
+    buyerIdentity: CartBuyerIdentity!
 
-  """The URL of the checkout for the cart."""
-  checkoutUrl: URL!
+    """The URL of the checkout for the cart."""
+    checkoutUrl: URL!
 
-  """The date and time when the cart was created."""
-  createdAt: DateTime!
+    """The date and time when the cart was created."""
+    createdAt: DateTime!
 
-  """The discount codes that have been applied to the cart."""
-  discountCodes: [CartDiscountCode!]!
+    """The discount codes that have been applied to the cart."""
+    discountCodes: [CartDiscountCode!]!
 
-  """
-  The estimated costs that the buyer will pay at checkout. The estimated costs
-  are subject to change and changes will be reflected at checkout.
-  """
-  estimatedCost: CartEstimatedCost!
+    """Gift cards applied to the cart."""
+    appliedGiftCards: [CartAppliedGiftCard!]!
 
-  """A globally-unique identifier."""
-  id: ID!
+    """The estimated costs that the buyer will pay at checkout."""
+    estimatedCost: CartEstimatedCost!
 
-  """
-  A list of lines containing information about the items the customer intends to purchase.
-  """
-  lines(
-    """Returns up to the first `n` elements from the list."""
-    first: Int
+    """A globally-unique identifier."""
+    id: ID!
 
-    """Returns the elements that come after the specified cursor."""
-    after: String
+    """Delivery groups for shipping options."""
+    deliveryGroups(first: Int, after: String): CartDeliveryGroupConnection!
 
-    """Returns up to the last `n` elements from the list."""
-    last: Int
+    """
+    A list of lines containing information about the items the customer intends to purchase.
+    """
+    lines(
+        """Returns up to the first `n` elements from the list."""
+        first: Int
 
-    """Returns the elements that come before the specified cursor."""
-    before: String
+        """Returns the elements that come after the specified cursor."""
+        after: String
 
-    """Reverse the order of the underlying list."""
-    reverse: Boolean = false
-  ): CartLineConnection!
+        """Returns up to the last `n` elements from the list."""
+        last: Int
 
-  """
-  A note that is associated with the cart. For example, the note can be a personalized message to the buyer.
-  """
-  note: String
+        """Returns the elements that come before the specified cursor."""
+        before: String
 
-  """The date and time when the cart was updated."""
-  updatedAt: DateTime!
+        """Reverse the order of the underlying list."""
+        reverse: Boolean = false
+    ): CartLineConnection!
+
+    """
+    A note that is associated with the cart. For example, the note can be a personalized message to the buyer.
+    """
+    note: String
+
+    """The date and time when the cart was updated."""
+    updatedAt: DateTime!
+
+    """List of user errors returned by the mutation."""
+    userErrors: [CartUserError!]
+}
+
+type CartAppliedGiftCard {
+    id: ID!
+    amountUsed: Money!
+    balance: Money!
+}
+
+type CartDeliveryGroupConnection {
+    """A list of delivery group edges."""
+    edges: [CartDeliveryGroupEdge!]!
+
+    """Pagination information about the delivery groups."""
+    pageInfo: PageInfo!
+}
+
+type CartDeliveryGroupEdge {
+    node: CartDeliveryGroup!
+}
+
+type CartDeliveryGroup {
+    """A list of available delivery options for this delivery group."""
+    deliveryOptions: [CartDeliveryOption!]!
+}
+
+type CartDeliveryOption {
+    """A unique handle for the delivery option."""
+    handle: String!
+
+    """The title of the delivery option."""
+    title: String!
+
+    """The estimated cost for this delivery option."""
+    estimatedCost: MoneyV2!
+}
+
+"""
+type CartDeliveryGroup {
+    deliveryOptions(first: Int, after: String): CartDeliveryOptionConnection!
+}
+"""
+
+type CartDeliveryOptionConnection {
+    edges: [CartDeliveryOptionEdge!]!
+}
+
+type CartDeliveryOptionEdge {
+    node: CartDeliveryOption!
 }
 
 """Return type for `cartAttributesUpdate` mutation."""
@@ -703,34 +757,23 @@ input CartInput {
 
 """Represents information about the merchandise in the cart."""
 type CartLine implements Node {
-  """
-  The attributes associated with the cart line. Attributes are represented as key-value pairs.
-  """
-  attributes: [Attribute!]!
+    """A globally unique identifier for the cart line item."""
+    id: ID!
 
-  """The discounts that have been applied to the cart line."""
-  discountAllocations: [CartDiscountAllocation!]!
+    """The quantity of the line item."""
+    quantity: Int!
 
-  """
-  The estimated cost of the merchandise that the buyer will pay for at checkout.
-  The estimated costs are subject to change and changes will be reflected at checkout.
-  """
-  estimatedCost: CartLineEstimatedCost!
+    """Custom attributes associated with the cart line."""
+    attributes: [Attribute!]!
 
-  """A globally-unique identifier."""
-  id: ID!
+    """The merchandise that the buyer intends to purchase."""
+    merchandise: ProductVariant!
 
-  """The merchandise that the buyer intends to purchase."""
-  merchandise: Merchandise!
+    """The discounts that have been allocated to the cart line."""
+    discountAllocations: [CartDiscountAllocation!]!
 
-  """The quantity of the merchandise that the customer intends to purchase."""
-  quantity: Int!
-
-  """
-  The selling plan associated with the cart line and the effect that each
-  selling plan has on variants when they're purchased.
-  """
-  sellingPlanAllocation: SellingPlanAllocation
+    """The estimated cost of the cart line."""
+    estimatedCost: CartLineEstimatedCost!
 }
 
 """
@@ -4839,6 +4882,14 @@ type MoneyV2 {
   currencyCode: CurrencyCode!
 }
 
+type Money {
+    """The monetary amount."""
+    amount: String!
+
+    """The currency of the monetary amount."""
+    currencyCode: CurrencyCode!
+}
+
 """
 The schema’s entry-point for mutations. This acts as the public, top-level API from which all mutation queries must start.
 """
@@ -5854,11 +5905,17 @@ Returns information about pagination in a connection, in accordance with the
 
 """
 type PageInfo {
-  """Whether there are more pages to fetch following the current page."""
-  hasNextPage: Boolean!
+    """When paginating forwards, the cursor to continue."""
+    endCursor: String
 
-  """Whether there are any pages prior to the current page."""
-  hasPreviousPage: Boolean!
+    """When paginating backwards, the cursor to continue."""
+    startCursor: String
+
+    """Indicates if there are more pages after the current page."""
+    hasNextPage: Boolean!
+
+    """Indicates if there are more pages before the current page."""
+    hasPreviousPage: Boolean!
 }
 
 """The set of valid sort keys for the Page query."""

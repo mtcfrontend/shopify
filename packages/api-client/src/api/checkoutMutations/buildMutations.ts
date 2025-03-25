@@ -1,14 +1,14 @@
 const checkoutMutation: (context) => any = (context): any => {
 
-  const input = context.client.graphQLClient.variable('input', 'CheckoutCreateInput!');
+  const input = context.client.graphQLClient.variable('input', 'CartInput!');
 
-  return context.client.graphQLClient.mutation('checkoutCreate', [input], (root) => {
-    root.add('checkoutCreate', {args: {input}}, (checkoutObj) => {
-      checkoutObj.add('checkout', (checkoutInfo) => {
-        checkoutInfo.add('id');
-        checkoutInfo.add('webUrl');
+  return context.client.graphQLClient.mutation('cartCreate', [input], (root) => {
+    root.add('cartCreate', { args: { input } }, (cartObj) => {
+      cartObj.add('cart', (cartInfo) => {
+        cartInfo.add('id');
+        cartInfo.add('checkoutUrl');
       });
-      checkoutObj.add('checkoutUserErrors', (error) => {
+      cartObj.add('userErrors', (error) => {
         error.add('code');
         error.add('field');
         error.add('message');

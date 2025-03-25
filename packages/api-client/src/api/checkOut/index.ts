@@ -1,162 +1,135 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { CustomQuery } from '@vue-storefront/core';
 import { gql } from '@apollo/client/core'
-import { getCountry } from '../../helpers/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export default async function checkOut(context, checkoutId, customQuery?: CustomQuery) {
-  const DEFAULT_QUERY = `query FETCH_CHECKOUT($country: CountryCode!, $id: ID!) @inContext(country: $country ) {
-    node(id: $id) {
+export default async function checkOut(context, cartId, customQuery?: CustomQuery) {
+  const DEFAULT_QUERY = `query FETCH_CART($id: ID!) {
+    cart(id: $id) {
       id
-      ... on Checkout {
-        appliedGiftCards{
-          id
-          amountUsedV2{
-            currencyCode
-            amount
-          }
-          balanceV2{
-            currencyCode
-            amount
-          }
-          
-        }
-        completedAt
-        createdAt
-        currencyCode
-        customAttributes{
-          key
-          value
-        }
-        discountApplications(first:20){
-          edges{
-            node{
-              ... on DiscountCodeApplication {
-                code
-                allocationMethod
-                targetType
-                targetSelection
-                value{
-                  ... on MoneyV2{
-                    amount
-                    currencyCode
-                  }
-                  ... on PricingPercentageValue{
-                    percentage
-                  }
-                }
-              }
-            }
-          }
-        }
-        email
+      checkoutUrl
+      createdAt
+      updatedAt
+      note
+  
+      appliedGiftCards {
         id
-        lineItems(first:250){
-          edges{
-            node{
-              customAttributes{
-                key
-                value
-              }
-              id
-              quantity
-              title
-              variant{
-                availableForSale
-                compareAtPriceV2{
-                  currencyCode
-                  amount
-                }
+        amountUsed {
+          amount
+          currencyCode
+        }
+        balance {
+          amount
+          currencyCode
+        }
+      }
+  
+      attributes {
+        key
+        value
+      }
+  
+      discountCodes {
+        code
+        applicable
+      }
+  
+      lines(first: 250) {
+        edges {
+          node {
+            id
+            quantity
+            attributes {
+              key
+              value
+            }
+            merchandise {
+              ... on ProductVariant {
                 id
-                image{
+                title
+                availableForSale
+                requiresShipping
+                sku
+                price {
+                  amount
+                  currencyCode
+                }
+                compareAtPrice {
+                  amount
+                  currencyCode
+                }
+                unitPrice {
+                  amount
+                  currencyCode
+                }
+                image {
                   altText
                   id
-                  height
-                  width
                   src
+                  width
+                  height
                 }
-                priceV2{
-                  currencyCode
-                  amount
-                }
-                compareAtPriceV2{
-                  currencyCode
-                  amount
-                }
-                product{
-                  handle
+                product {
                   id
+                  handle
+                  title
                 }
-                selectedOptions{
+                selectedOptions {
                   name
                   value
                 }
-                sku
-                title
-                unitPrice{
-                  currencyCode
-                  amount
-                }
               }
             }
           }
         }
-        lineItemsSubtotalPrice{
-          currencyCode
+      }
+  
+      estimatedCost {
+        subtotalAmount {
           amount
-        }
-        note
-        order {
-          id
-        }
-        orderStatusUrl
-        paymentDueV2{
           currencyCode
+        }
+        totalAmount {
           amount
+          currencyCode
         }
-        ready
-        requiresShipping
-        shippingAddress {
-          id
+        totalTaxAmount {
+          amount
+          currencyCode
         }
-        shippingLine{
-          handle
-          priceV2{
-            currencyCode
-            amount
+      }
+  
+      deliveryGroups(first: 10) {
+        edges {
+          node {
+            deliveryOptions {
+                handle
+                title
+                estimatedCost {
+                    amount
+                    currencyCode
+                }
+            }
           }
-          title
         }
-        subtotalPriceV2{
-          currencyCode
-          amount
-        }
-        taxExempt
-        taxesIncluded
-        totalPriceV2{
-          currencyCode
-          amount
-        }
-        totalTaxV2{
-          currencyCode
-          amount
-        }
-        updatedAt
-        webUrl
       }
+  
+      buyerIdentity {
+        email
+        countryCode
       }
-    }`
+    }
+  }`
 
   const payload = {
-    id: checkoutId,
-    country: getCountry(context),
+    id: cartId,
   }
 
-  const { node } = context.extendQuery(
+  const { cart } = context.extendQuery(
     customQuery,
     {
-      node: {
+      cart: {
         query: DEFAULT_QUERY as any,
         variables: payload
       }
@@ -164,23 +137,33 @@ export default async function checkOut(context, checkoutId, customQuery?: Custom
   )
 
   return await context.client.apolloClient.query({
-    query: gql(node.query) as any,
-    variables: node.variables
+    query: gql(cart.query) as any,
+    variables: cart.variables
   }).then((result) => {
-    const discountApplications = result.data.node.discountApplications.edges.map((discountApplications => discountApplications.node));
-    const lineItems = result.data.node.lineItems.edges.map((lineItem => lineItem.node));
+
+    // Extract discount codes
+    const discountCodes = result.data.cart.discountCodes?.map(discount => ({
+      code: discount.code,
+      applicable: discount.applicable
+    })) || [];
+
+    // Extract line items
+    const lines = result.data.cart.lines.edges?.map(edge => edge.node) || [];
+
+    // Create a clean result object
     const newResult = {
       ...result,
       data: {
         ...result.data,
-        node: {
-          ...result.data.node,
-          discountApplications,
-          lineItems
+        cart: {
+          ...result.data.cart,
+          discountCodes,
+          lines
         }
       }
-    }
-    return newResult.data.node
-  })
+    };
+
+    return newResult.data.cart;
+  });
 
 }

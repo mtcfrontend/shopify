@@ -53,6 +53,8 @@ export type Scalars = {
 
   /** Time is a scalar value that represents an ISO8601 formatted time. */
   Time: any;
+
+  URL: any;
 };
 
 export type AbsoluteDiscountValue = CartDiscountValue &
@@ -2530,9 +2532,11 @@ export type HighPrecisionMoneyInput = {
 
 export type Image = {
   __typename?: 'Image';
-  url: Scalars['String'];
-  dimensions: Dimensions;
-  label?: Maybe<Scalars['String']>;
+  id?: Maybe<string>;
+  src?:  Maybe<Scalars['URL']>;
+  altText?: Maybe<Scalars['String']>;
+  width?: Maybe<Scalars['Int']>;
+  height?: Maybe<Scalars['Int']>;
 };
 
 export type ImageInput = {
@@ -2841,40 +2845,14 @@ export type KeyReference = {
  * variant a line item relates to has been deleted.
  */
 export type LineItem = {
-  __typename?: 'LineItem';
-  id: Scalars['String'];
-  productId: Scalars['String'];
-  name?: Maybe<Scalars['String']>;
-  nameAllLocales: Array<LocalizedString>;
-  productSlug?: Maybe<Scalars['String']>;
-  productType?: Maybe<ProductTypeDefinition>;
-  productTypeRef?: Maybe<Reference>;
-  variant?: Maybe<ProductVariant>;
-  price: ProductPrice;
-  taxedPrice?: Maybe<TaxedItemPrice>;
-  totalPrice?: Maybe<Money>;
-  quantity: Scalars['Long'];
-  state: Array<ItemState>;
-  taxRate?: Maybe<TaxRate>;
-  supplyChannel?: Maybe<Channel>;
-  supplyChannelRef?: Maybe<Reference>;
-  distributionChannel?: Maybe<Channel>;
-  distributionChannelRef?: Maybe<Reference>;
-  discountedPricePerQuantity: Array<DiscountedLineItemPriceForQuantity>;
-  lineItemMode: LineItemMode;
-  priceMode: LineItemPriceMode;
-
-  /** This field contains non-typed data. Consider using `customFields` as a typed alternative. */
-  customFieldsRaw?: Maybe<Array<RawCustomField>>;
-
-  /** This field would contain type data */
-  customFields?: Maybe<Type>;
-  custom?: Maybe<CustomFieldsType>;
-  shippingDetails?: Maybe<ItemShippingDetails>;
-  inventoryMode?: Maybe<ItemShippingDetails>;
-
-  /** Custom fields are returned as a list instead of an object structure. */
-  customFieldList?: Maybe<Array<CustomField>>;
+  __typename?: 'CartLine';
+  id: string;
+  quantity: number;
+  attributes?: Maybe<Array<{
+    key: string;
+    value: string;
+  }>>;
+  merchandise: ProductVariant;
 };
 
 /** A line item is a snapshot of a product variant at the time it was added to the cart.
@@ -4869,25 +4847,23 @@ export type ProductUpdateAction = {
 
 export type ProductVariant = {
   __typename?: 'ProductVariant';
-  id: Scalars['Int'];
-  key?: Maybe<Scalars['String']>;
-  sku?: Maybe<Scalars['String']>;
-  prices?: Maybe<Array<ProductPrice>>;
-
-  /** Returns a single price based on the price selection rules. */
-  price?: Maybe<ProductPrice>;
-  images: Array<Image>;
-  assets: Array<Asset>;
-  availability?: Maybe<ProductVariantAvailabilityWithChannels>;
-
-  /** This field contains non-typed data. Consider using `attributes` as a typed alternative. */
-  attributesRaw: Array<RawProductAttribute>;
-
-  /** Product attributes */
-  attributes: ProductType;
-
-  /** Product attributes are returned as a list instead of an object structure. */
-  attributeList: Array<Attribute>;
+  id: string;
+  title: string;
+  availableForSale: boolean;
+  requiresShipping: boolean;
+  sku?: Maybe<string>;
+  price: MoneyV2;
+  compareAtPrice?: Maybe<MoneyV2>;
+  unitPrice?: Maybe<MoneyV2>;
+  image?: Maybe<Image>;
+  product: {
+    id: string;
+    handle: string;
+  };
+  selectedOptions?: Maybe<Array<{
+    name: string;
+    value: string;
+  }>>;
 };
 
 export type ProductVariantPriceArgs = {

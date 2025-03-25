@@ -1,6 +1,5 @@
 import { CustomQuery } from '@vue-storefront/core';
 import { gql } from '@apollo/client/core';
-import { getCountry } from '../../helpers/utils';
 export async function removeFromCart(context, params, _customQuery?: CustomQuery) {
   const { currentCart, product } = params;
   // products to be remove
@@ -8,176 +7,172 @@ export async function removeFromCart(context, params, _customQuery?: CustomQuery
     product.id
   ];
 
-  const DEFAULT_MUTATION = `mutation checkoutLineItemsRemove($country:CountryCode, $checkoutId: ID!, $lineItemIds: [ID!]!) @inContext(country:$country){
-  checkoutLineItemsRemove(checkoutId: $checkoutId, lineItemIds: $lineItemIds){
-    checkout{
-      appliedGiftCards{
-          id
-          amountUsedV2{
-            currencyCode
-            amount
-          }
-          balanceV2{
-            currencyCode
-            amount
-          }
-          
-        }
-        completedAt
-        createdAt
-        currencyCode
-        customAttributes{
-          key
-          value
-        }
-        discountApplications(first:20){
-          edges{
-            node{
-              ... on DiscountCodeApplication {
-                code
-                allocationMethod
-                targetType
-                targetSelection
-                value{
-                  ... on MoneyV2{
-                    amount
-                    currencyCode
-                  }
-                  ... on PricingPercentageValue{
-                    percentage
-                  }
-                }
-              }
-            }
-          }
-        }
-        email
+  const DEFAULT_MUTATION = `mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
+    cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+      cart {
         id
-        lineItems(first:250){
-          edges{
-            node{
-              customAttributes{
-                key
-                value
-              }
+        checkoutUrl
+        totalQuantity
+        lines(first: 10) {
+          edges {
+            node {
               id
               quantity
-              title
-              variant{
-                availableForSale
-                compareAtPriceV2{
-                  currencyCode
-                  amount
-                }
-                id
-                image{
-                  altText
+              merchandise {
+                ... on ProductVariant {
                   id
-                  height
-                  width
-                  src
-                }
-                priceV2{
-                  currencyCode
-                  amount
-                }
-                compareAtPriceV2{
-                  currencyCode
-                  amount
-                }
-                product{
-                  handle
-                  id
-                }
-                selectedOptions{
-                  name
-                  value
-                }
-                sku
-                title
-                unitPrice{
-                  currencyCode
-                  amount
+                  title
                 }
               }
             }
           }
         }
-        lineItemsSubtotalPrice{
-          currencyCode
-          amount
-        }
-        note
-        order {
-          id
-        }
-        orderStatusUrl
-        paymentDueV2{
-          currencyCode
-          amount
-        }
-        ready
-        requiresShipping
-        shippingAddress {
-          id
-        }
-        shippingLine{
-          handle
-          priceV2{
-            currencyCode
-            amount
-          }
-          title
-        }
-        subtotalPriceV2{
-          currencyCode
-          amount
-        }
-        taxExempt
-        taxesIncluded
-        totalPriceV2{
-          currencyCode
-          amount
-        }
-        totalTaxV2{
-          currencyCode
-          amount
-        }
-        updatedAt
-        webUrl
       }
     }
   }`
   const payload = {
-    lineItemIds: lineItemIdsToRemove,
-    country: getCountry(context),
-    checkoutId: currentCart.id
-  }
+    lineIds: lineItemIdsToRemove,
+    cartId: currentCart.id,
+  };
 
-    const { checkoutLineItemsRemove } = context.extendQuery(
+    const { cartLinesRemove } = context.extendQuery(
       _customQuery,
       {
-        checkoutLineItemsRemove: {
+        cartLinesRemove: {
           mutation: DEFAULT_MUTATION,
           payload
         }
       }
     )
 
-
-  return await context.client.apolloClient.mutate({
-    mutation: gql(checkoutLineItemsRemove.mutation) as any,
-    variables: checkoutLineItemsRemove.payload
-  }).then((result) => {
-    const discountApplications = result.data.checkoutLineItemsRemove.checkout.discountApplications.edges.map((discountApplications => discountApplications.node));
-      const lineItems = result.data.checkoutLineItemsRemove.checkout.lineItems.edges.map((lineItem => lineItem.node));
-      delete (result.data.checkoutLineItemsRemove.checkout.lineItems);
-      delete (result.data.checkoutLineItemsRemove.checkout.discountApplications);
-      result.data.checkoutLineItemsRemove.checkout = {
-          ...result.data.checkoutLineItemsRemove.checkout,
-          discountApplications,
-          lineItems
-      };
-    return result.data.checkoutLineItemsRemove.checkout;
+  const result = await context.client.apolloClient.mutate({
+    mutation: gql(cartLinesRemove.mutation) as any,
+    variables: cartLinesRemove.payload,
   });
+
+  const updatedCart = await context.client.apolloClient.query({
+    query: gql`query FETCH_CART($id: ID!) {
+      cart(id: $id) {
+        id
+        checkoutUrl
+        createdAt
+        updatedAt
+        note
+        discountCodes {
+          code
+          applicable
+        }
+        lines(first: 250) {
+          edges {
+            node {
+              id
+              quantity
+              attributes {
+                key
+                value
+              }
+              merchandise {
+                ... on ProductVariant {
+                  id
+                  title
+                  availableForSale
+                  sku
+                  price {
+                    amount
+                    currencyCode
+                  }
+                  compareAtPrice {
+                    amount
+                    currencyCode
+                  }
+                  unitPrice {
+                    amount
+                    currencyCode
+                  }
+                  image {
+                    altText
+                    id
+                    src
+                    width
+                    height
+                  }
+                  product {
+                    id
+                    handle
+                    title
+                  }
+                  selectedOptions {
+                    name
+                    value
+                  }
+                }
+              }
+            }
+          }
+        }
+        estimatedCost {
+          subtotalAmount {
+            amount
+            currencyCode
+          }
+          totalAmount {
+            amount
+            currencyCode
+          }
+          totalTaxAmount {
+            amount
+            currencyCode
+          }
+        }
+        attributes {
+          key
+          value
+        }
+        deliveryGroups(first: 10) {
+          edges {
+            node {
+              deliveryOptions {
+                handle
+                title
+                estimatedCost {
+                  amount
+                  currencyCode
+                }
+              }
+            }
+          }
+        }
+        appliedGiftCards {
+          id
+          amountUsed {
+            amount
+            currencyCode
+          }
+          balance {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }`,
+    variables: { id: currentCart.id },
+    fetchPolicy: 'network-only' // Ensure fresh data
+  });
+
+  const cartData = updatedCart.data.cart;
+
+  const discountCodes = (cartData.discountCodes || []).map(discount => ({
+    code: discount.code,
+    applicable: discount.applicable
+  }));
+
+  const lines = (cartData.lines.edges || []).map(edge => edge.node);
+
+  const finalCart = {
+    ...cartData,
+    discountCodes,
+    lines
+  };
+
+  return finalCart;
 }

@@ -14,6 +14,12 @@ type Scalars = {
 
   /** DateTime is a scalar value that represents an ISO8601 formatted date and time. */
   DateTime: any;
+  /**
+   * A signed decimal number, which supports arbitrary precision and is serialized as a string.
+   *
+   * Example values: `"29.99"`, `"29.999"`.
+   */
+  Decimal: any;
 
   /** [ISO 3166-1](http://en.wikipedia.org/wiki/ISO_3166-1) country code. */
   Country: any;
@@ -52,69 +58,212 @@ type Scalars = {
 
   /** Time is a scalar value that represents an ISO8601 formatted time. */
   Time: any;
+  URL: any;
 };
 export type Cart = {
   __typename?: 'Cart';
-  appliedGiftCards: Maybe<Scalars['Array']>;
-  completedAt: Maybe<Scalars['String']>;
-  code?: Maybe<Scalars['String']>;
-  checkoutUserErrors?: Maybe<Scalars['Array']>;
-  createdAt: Maybe<Scalars['String']>;
-  currencyCode: Maybe<Scalars['String']>;
-  customAttributes: Maybe<Scalars['Array']>;
-  discountApplications: Maybe<Scalars['Array']>;
-  email: Maybe<Scalars['String']>;
-  errors: Maybe<Scalars['Json']>;
   id: Maybe<Scalars['String']>;
-  lineItems?: Maybe<Scalars['Array']>;
-  lineItemsSubtotalPrice?: Maybe<Scalars['Json']>;
-  note?: Maybe<Scalars['String']>;
-  order?: Maybe<Scalars['String']>;
-  orderStatusUrl?: Maybe<Scalars['String']>;
-  paymentDue?: Maybe<Scalars['String']>;
-  ready?: Maybe<Scalars['String']>;
-  requiresShipping?: Maybe<Scalars['String']>;
-  shippingAddress?: Maybe<Scalars['Json']>;
-  shippingLine?: Maybe<Scalars['String']>;
-  subtotalPrice?: Maybe<Scalars['String']>;
-  taxExempt?: Maybe<Scalars['String']>;
-  taxesIncluded?: Maybe<Scalars['String']>;
-  totalPrice?: Maybe<Scalars['String']>;
-  totalTax?: Maybe<Scalars['String']>;
+  checkoutUrl?: Maybe<Scalars['String']>;
+  createdAt: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
-  userErrors?: Maybe<Scalars['Array']>;
-  webUrl?: Maybe<Scalars['String']>;
-}
+  note?: Maybe<Scalars['String']>;
+
+  appliedGiftCards: Maybe<Array<{
+    id: string;
+    amountUsed: {
+      amount: string;
+      currencyCode: string;
+    };
+    balance: {
+      amount: string;
+      currencyCode: string;
+    };
+  }>>;
+
+  attributes: Maybe<Array<{
+    key: string;
+    value: string;
+  }>>;
+
+  discountCodes: Maybe<Array<{
+    code: string;
+    applicable: boolean;
+  }>>;
+
+  lines: Maybe<Array<{
+    __typename?: 'CartLine';
+    /** The unique identifier for the cart line item. */
+    id: string;
+    /** The quantity of the item in the cart. */
+    quantity: number;
+    /** Custom attributes associated with the cart line. */
+    attributes?: Maybe<Array<{
+      key: string;
+      value: string;
+    }>>;
+    /** The merchandise details (product variant) for the cart line. */
+    merchandise: {
+      __typename?: 'ProductVariant';
+      /** The unique identifier for the product variant. */
+      id: string;
+      /** The title of the product variant. */
+      title: string;
+      /** Indicates if the variant is available for sale. */
+      availableForSale: boolean;
+      /** Whether the variant requires shipping. */
+      requiresShipping: boolean;
+      /** The SKU (stock keeping unit) for the product variant. */
+      sku?: Maybe<string>;
+      /** The price of the variant. */
+      price: {
+        amount: string;
+        currencyCode: string;
+      };
+      /** The compare-at price of the variant, if any. */
+      compareAtPrice?: Maybe<{
+        amount: string;
+        currencyCode: string;
+      }>;
+      /** The unit price of the variant, if applicable. */
+      unitPrice?: Maybe<{
+        amount: string;
+        currencyCode: string;
+      }>;
+      /** The product image. */
+      image?: Maybe<{
+        altText?: Maybe<string>;
+        id?: string;
+        src?: string;
+        width?: Maybe<number>;
+        height?: Maybe<number>;
+      }>;
+      /** The associated product details. */
+      product: {
+        handle: string;
+        id: string;
+      };
+      /** The selected options for the variant, like size or color. */
+      selectedOptions?: Maybe<Array<{
+        name: string;
+        value: string;
+      }>>;
+    };
+  }>>;
+
+  estimatedCost?: Maybe<{
+    subtotalAmount: {
+      amount: string;
+      currencyCode: string;
+    };
+    totalAmount: {
+      amount: string;
+      currencyCode: string;
+    };
+    totalTaxAmount?: Maybe<{
+      amount: string;
+      currencyCode: string;
+    }>;
+  }>;
+
+  deliveryGroups?: Maybe<Array<{
+    deliveryMethods: Array<{
+      handle: string;
+      title: string;
+      price: {
+        amount: string;
+        currencyCode: string;
+      };
+    }>;
+  }>>;
+
+  shippingAddress?: Maybe<Scalars['Json']>;
+
+  buyerIdentity?: Maybe<{
+    email?: Maybe<Scalars['String']>;
+    countryCode?: Maybe<Scalars['String']>;
+  }>;
+
+  userErrors?: Maybe<Array<{
+    field?: Maybe<Array<Scalars['String']>>;
+    message: string;
+    code?: Maybe<string>;
+  }>>;
+};
 
 export type CartItem = {
   __typename?: 'CartItem';
   id: Maybe<Scalars['String']>;
-  variant?: Maybe<Scalars['Array']>;
-}
+  quantity: number;
+  attributes?: Maybe<Array<{
+    key: string;
+    value: string;
+  }>>;
+  merchandise?: Maybe<{
+    id: string;
+    title: string;
+    sku?: string;
+    availableForSale: boolean;
+    price: {
+      amount: string;
+      currencyCode: string;
+    };
+    compareAtPrice?: {
+      amount: string;
+      currencyCode: string;
+    };
+    product: {
+      id: string;
+      handle: string;
+    };
+    selectedOptions?: Maybe<Array<{
+      name: string;
+      value: string;
+    }>>;
+    image?: Maybe<{
+      altText?: string;
+      src: string;
+      width?: number;
+      height?: number;
+    }>;
+  }>;
+};
 export type Wishlist = {}
+/** A monetary value with currency. */
+export type MoneyV2 = {
+  __typename?: 'MoneyV2';
+  /** Decimal money amount. */
+  amount: string;
+  /** Currency of the money. */
+  currencyCode: string;
+};
+export type Image = {
+  __typename?: 'Image';
+  id?: Maybe<string>;
+  src?:  Maybe<Scalars['URL']>;
+  altText?: Maybe<Scalars['String']>;
+  width?: Maybe<Scalars['Int']>;
+  height?: Maybe<Scalars['Int']>;
+};
 export type ProductVariant = {
   __typename?: 'ProductVariant';
-  _id?: Maybe<Scalars['String']>;
-  _description: Maybe<Scalars['String']>;
-  _descriptionHtml: Maybe<Scalars['String']>;
-  _slug: Maybe<Scalars['String']>;
-  _categoriesRef: string[];
-  name: Maybe<Scalars['String']>;
-  images: Maybe<Scalars['Array']>;
-  product?: Maybe<Scalars['Array']>;
-  options: Maybe<Scalars['Array']>;
-  variantBySelectedOptions?: Maybe<Scalars['Array']>;
-  _coverImage: Maybe<Scalars['String']>;
-  price: {
-    original: number;
-    current: number;
+  id: string;
+  title: string;
+  availableForSale: boolean;
+  requiresShipping: boolean;
+  sku?: Maybe<string>;
+  price: MoneyV2;
+  compareAtPrice?: Maybe<MoneyV2>;
+  unitPrice?: Maybe<MoneyV2>;
+  image?: Maybe<Image>;
+  product: {
+    id: string;
+    handle: string;
   };
-  variants?: Maybe<Scalars['Array']>;
-  available?: Maybe<Scalars['Boolean']>;
-  productType: Maybe<Scalars['String']>;
-  availableForSale?: Maybe<Scalars['Boolean']>;
-  totalInventory?: Maybe<Scalars['Int']>;
-}
+  selectedOptions?: Maybe<Array<{
+    name: string;
+    value: string;
+  }>>;
+};
 
 export type Category = {
   id: number;
@@ -125,33 +274,12 @@ export type Category = {
 export type CategoryFilter = {}
 export type ShippingMethod = {}
 export type LineItem = {
-  __typename?: 'LineItem';
-  customAttributes: Maybe<Scalars['Array']>;
-  discountAllocations: Maybe<Scalars['Array']>;
-  hasNextPage: Maybe<Scalars['String']>;
-  hasPreviousPage: Maybe<Scalars['String']>;
-  id: Maybe<Scalars['String']>;
-  quantity: Maybe<Scalars['Int']>;
-  title: Maybe<Scalars['String']>;
-  variant: {
-    available: Maybe<Scalars['Boolean']>;
-    compareAtPriceV2: Maybe<Scalars['String']>;
-    currentlyNotInStock: Maybe<Scalars['Boolean']>;
-    id: Maybe<Scalars['String']>;
-    image: {
-      altText: Maybe<Scalars['String']>;
-      id: Maybe<Scalars['String']>;
-      src: Maybe<Scalars['String']>;
-    };
-    price: Maybe<Scalars['String']>;
-    compareAtPrice: Maybe<Scalars['String']>;
-    priceV2: Maybe<Scalars['Json']>;
-    product: Maybe<Scalars['Json']>;
-    quantityAvailable: Maybe<Scalars['Int']>;
-    sku: Maybe<Scalars['String']>;
-    title: Maybe<Scalars['String']>;
-    unitPrice: Maybe<Scalars['String']>;
-    weight: Maybe<Scalars['Float']>;
-    selectedOptions?: Maybe<Scalars['Array']>;
-  };
+  __typename?: 'CartLine';
+  id: string;
+  quantity: number;
+  attributes?: Maybe<Array<{
+    key: string;
+    value: string;
+  }>>;
+  merchandise: ProductVariant;
 };
