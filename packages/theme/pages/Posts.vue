@@ -481,8 +481,8 @@ import {
   SfSelect
 } from '@storefront-ui/vue';
 import { onSSR } from '@vue-storefront/core';
-import { useContent } from '@vue-storefront/shopify';
-import { ContentType } from '@vue-storefront/shopify/src/types/ContentType';
+import { useContent } from '@mtcmedia/shopify';
+import { ContentType } from '@mtcmedia/shopify/src/types/ContentType';
 export default {
   name: 'Category',
   components: {

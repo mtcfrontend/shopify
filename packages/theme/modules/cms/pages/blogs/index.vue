@@ -3,7 +3,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, useRouter, onBeforeMount, useContext } from '@nuxtjs/composition-api';
-import { useContent, ContentType } from '@vue-storefront/shopify';
+import { useContent, ContentType } from '@mtcmedia/shopify';
 
 export default defineComponent({
   setup() {

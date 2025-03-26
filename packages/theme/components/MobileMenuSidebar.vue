@@ -22,7 +22,7 @@
 import { SfSidebar, SfList, SfMenuItem } from '@storefront-ui/vue';
 import { defineComponent, computed, useContext } from '@nuxtjs/composition-api';
 import { onSSR } from '@vue-storefront/core';
-import { useCategory } from '@vue-storefront/shopify';
+import { useCategory } from '@mtcmedia/shopify';
 import { useUiState } from '~/composables';
 
 export default defineComponent({

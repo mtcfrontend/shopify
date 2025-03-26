@@ -38,7 +38,7 @@ import {
   cartGetters,
   useCart,
   userGetters
-} from '@vue-storefront/shopify';
+} from '@mtcmedia/shopify';
 import { computed, onBeforeMount, provide, useRoute, useContext } from '@nuxtjs/composition-api';
 import LoadWhenVisible from '~/components/utils/LoadWhenVisible';
 export default {

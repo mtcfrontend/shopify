@@ -3,8 +3,8 @@ import {
   useContentFactory,
   UseContentFactoryParams
 } from '@vue-storefront/core';
-import { QueryRootBlogArgs, QueryRootBlogsArgs, QueryRootNodeArgs, QueryRootPageArgs } from '@vue-storefront/shopify-apollo/src/shopify';
-import { GetArticlesParams } from '@vue-storefront/shopify-apollo/src/types/GetArticlesParams';
+import { QueryRootBlogArgs, QueryRootBlogsArgs, QueryRootNodeArgs, QueryRootPageArgs } from '@mtcmedia/shopify-apollo/src/shopify';
+import { GetArticlesParams } from '@mtcmedia/shopify-apollo/src/types/GetArticlesParams';
 import { Context } from '../types'
 import { ContentType } from '../types/ContentType';
 import { UseContentParams } from '../types/UseContentParams';

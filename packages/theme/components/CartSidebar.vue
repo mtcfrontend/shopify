@@ -178,7 +178,7 @@ import {
   SfIcon
 } from '@storefront-ui/vue';
 import { computed, ref, useRoute } from '@nuxtjs/composition-api';
-import { useCart, useUser, cartGetters } from '@vue-storefront/shopify';
+import { useCart, useUser, cartGetters } from '@mtcmedia/shopify';
 import { useUiState, useUiNotification } from '~/composables';
 import debounce from 'lodash.debounce';
 

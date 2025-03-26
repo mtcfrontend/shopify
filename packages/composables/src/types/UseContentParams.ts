@@ -1,5 +1,5 @@
-import { QueryRootPageArgs, QueryRootBlogsArgs, QueryRootBlogArgs } from "@vue-storefront/shopify-apollo/src/shopify";
-import { GetArticlesParams } from "@vue-storefront/shopify-apollo/src/types/GetArticlesParams";
+import { QueryRootPageArgs, QueryRootBlogsArgs, QueryRootBlogArgs } from "@mtcmedia/shopify-apollo/src/shopify";
+import { GetArticlesParams } from "@mtcmedia/shopify-apollo/src/types/GetArticlesParams";
 import { ContentType } from "./ContentType";
 
 export interface BaseUseContentParams {

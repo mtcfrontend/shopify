@@ -302,7 +302,7 @@ import {
   useContext
 } from '@nuxtjs/composition-api';
 import { onSSR } from '@vue-storefront/core';
-import { useContent, ContentType } from '@vue-storefront/shopify';
+import { useContent, ContentType } from '@mtcmedia/shopify';
 import {
   getArticleImage,
   getArticleLink,

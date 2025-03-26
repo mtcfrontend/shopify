@@ -1,5 +1,5 @@
 import { useSearchFactory, ProductsSearchParams } from '@vue-storefront/core'
-import type { getShopifyApolloAPIs } from '@vue-storefront/shopify-apollo'
+import type { getShopifyApolloAPIs } from '@mtcmedia/shopify-apollo'
 
 import { useSearchFactoryParams } from './params'
 

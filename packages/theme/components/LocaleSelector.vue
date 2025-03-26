@@ -45,7 +45,7 @@ import {
   SfBottomModal,
   SfCharacteristic
 } from '@storefront-ui/vue';
-import { useAvailableCountries } from '@vue-storefront/shopify';
+import { useAvailableCountries } from '@mtcmedia/shopify';
 import {
   ref,
   computed,

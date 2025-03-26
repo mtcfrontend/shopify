@@ -129,7 +129,7 @@ import {
   productGetters,
   useReview,
   reviewGetters
-} from '@vue-storefront/shopify';
+} from '@mtcmedia/shopify';
 
 export default {
   name: 'Product',

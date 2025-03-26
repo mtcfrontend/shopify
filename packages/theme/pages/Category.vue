@@ -378,7 +378,7 @@ import {
   productGetters,
   useFacet,
   facetGetters
-} from '@vue-storefront/shopify';
+} from '@mtcmedia/shopify';
 import { useUiHelpers, useUiState, useUiNotification } from '~/composables';
 import { onSSR } from '@vue-storefront/core';
 

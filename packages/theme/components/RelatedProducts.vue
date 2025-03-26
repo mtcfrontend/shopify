@@ -94,7 +94,7 @@ import {
   SfButton
 } from '@storefront-ui/vue';
 import useUiNotification from '../composables/useUiNotification';
-import { productGetters, useCart } from '@vue-storefront/shopify';
+import { productGetters, useCart } from '@mtcmedia/shopify';
 
 export default {
   name: 'RelatedProducts',

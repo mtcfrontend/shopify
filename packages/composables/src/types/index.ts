@@ -1,5 +1,5 @@
-import { ProductVariant } from '@vue-storefront/shopify-api';
-import { ShopifyApolloContext } from '@vue-storefront/shopify-apollo'
+import { ProductVariant } from '@mtcmedia/shopify-api';
+import { ShopifyApolloContext } from '@mtcmedia/shopify-apollo'
 
 // New Types
 export interface Context {

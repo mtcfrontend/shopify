@@ -235,7 +235,7 @@ import {
   SfLoader
 } from '@storefront-ui/vue';
 import { computed, ref } from '@nuxtjs/composition-api';
-import { useUserOrders, orderGetters } from '@vue-storefront/shopify';
+import { useUserOrders, orderGetters } from '@mtcmedia/shopify';
 import { AgnosticOrderStatus , onSSR } from '@vue-storefront/core';
 
 export default {

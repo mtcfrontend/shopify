@@ -1,7 +1,7 @@
 module.exports = {
   integrations: {
     shopify: {
-      location: '@vue-storefront/shopify-api/server',
+      location: '@mtcmedia/shopify-api/server',
       configuration: {
         api: {
           domain: process.env.SHOPIFY_DOMAIN,

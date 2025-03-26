@@ -1,5 +1,5 @@
 import { useVSFContext } from '@vue-storefront/core'
-import type { getShopifyApolloAPIs } from '@vue-storefront/shopify-apollo'
+import type { getShopifyApolloAPIs } from '@mtcmedia/shopify-apollo'
 import { Context } from '../types'
 
 export type AvailableFiltersResult = ReturnType<ReturnType<typeof getShopifyApolloAPIs>['availableFilters']>

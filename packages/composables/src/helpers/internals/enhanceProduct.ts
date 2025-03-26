@@ -1,4 +1,4 @@
-import { ProductVariant } from "@vue-storefront/shopify-api";
+import { ProductVariant } from "@mtcmedia/shopify-api";
 
 type EnhancedProduct = ProductVariant
 

@@ -1,5 +1,5 @@
 import { CategoryGetters, AgnosticCategoryTree } from '@vue-storefront/core';
-import { Category } from '@vue-storefront/shopify-api/src/types';
+import { Category } from '@mtcmedia/shopify-api/src/types';
 const itemToTree = (category): AgnosticCategoryTree => {
   return {
     label: category.title,

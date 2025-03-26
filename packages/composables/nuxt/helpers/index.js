@@ -1,4 +1,4 @@
-import defaultConfig from '@vue-storefront/shopify/nuxt/defaultConfig';
+import defaultConfig from '@mtcmedia/shopify/nuxt/defaultConfig';
 
 const getLocaleSettings = (moduleOptions, app) => {
 

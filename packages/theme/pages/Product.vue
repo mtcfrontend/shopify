@@ -230,7 +230,7 @@ import {
 import InstagramFeed from '~/components/InstagramFeed.vue';
 import RelatedProducts from '~/components/RelatedProducts.vue';
 import { ref, computed, watch, useRoute, useRouter } from '@nuxtjs/composition-api';
-import { useProduct, useCart, productGetters } from '@vue-storefront/shopify';
+import { useProduct, useCart, productGetters } from '@mtcmedia/shopify';
 import MobileStoreBanner from '~/components/MobileStoreBanner.vue';
 import LazyHydrate from 'vue-lazy-hydration';
 import { onSSR } from '@vue-storefront/core';

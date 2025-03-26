@@ -1,6 +1,6 @@
 {
-  "name": "@vue-storefront/shopify-apollo",
-  "version": "1.1.4",
+  "name": "@mtcmedia/shopify-apollo",
+  "version": "1.0.0",
   "description": "Vue Storefront Shopify Apollo Client",
   "keywords": [
     "apollo",
@@ -8,7 +8,7 @@
     "shopify"
   ],
   "author": "Jeff Paltera <jpaltera@vuestorefront.io>",
-  "homepage": "https://github.com/vuestorefront/shopify#readme",
+  "homepage": "https://github.com/mtcfrontend/shopify#readme",
   "license": "MIT",
   "types": "./lib/library.d.ts",
   "typings": "./lib/library.d.ts",
@@ -34,7 +34,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vuestorefront/shopify.git"
+    "url": "git+https://github.com/mtcfrontend/shopify.git"
   },
   "scripts": {
     "dev": "concurrently \"tsc --watch --preserveWatchOutput\" \"vite build --watch\"",
@@ -45,7 +45,7 @@
     "test": "jest"
   },
   "bugs": {
-    "url": "https://github.com/vuestorefront/shopify/issues"
+    "url": "https://github.com/mtcfrontend/shopify/issues"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^2.3.0",
