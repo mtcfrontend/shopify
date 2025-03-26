@@ -1,4 +1,4 @@
-import { ShippingMethod } from '@vue-storefront/shopify-api/src/types';
+import { ShippingMethod } from '@mtcmedia/shopify-api/src/types';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getShippingMethodId = (shippingMethod: ShippingMethod): string => '';

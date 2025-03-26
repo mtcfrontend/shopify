@@ -53,7 +53,7 @@ import { SfBottomNavigation, SfIcon, SfCircleIcon } from '@storefront-ui/vue';
 import useUiState from '~/composables/useUiState';
 import { useRouter } from '@nuxtjs/composition-api';
 import MobileMenuSidebar from '~/components/MobileMenuSidebar.vue';
-import { useUser } from '@vue-storefront/shopify';
+import { useUser } from '@mtcmedia/shopify';
 
 export default {
   components: {

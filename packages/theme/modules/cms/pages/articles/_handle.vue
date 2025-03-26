@@ -22,7 +22,7 @@ import {
   useRoute
 } from '@nuxtjs/composition-api';
 import { SfLoader } from '@storefront-ui/vue';
-import { useContent, ContentType } from '@vue-storefront/shopify';
+import { useContent, ContentType } from '@mtcmedia/shopify';
 import { onSSR } from '@vue-storefront/core';
 import useUiHelpers from '~/composables/useUiHelpers';
 import { getArticleImage } from '~/helpers/article'

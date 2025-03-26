@@ -347,7 +347,7 @@ import {
 } from '@storefront-ui/vue';
 
 import { ref, watch, computed } from '@nuxtjs/composition-api';
-import { productGetters, useCart } from '@vue-storefront/shopify';
+import { productGetters, useCart } from '@mtcmedia/shopify';
 import { useUiNotification } from '~/composables';
 import useUiHelpers from '../composables/useUiHelpers';
 import {

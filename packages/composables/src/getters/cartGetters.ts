@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { CartGetters, AgnosticPrice, AgnosticTotals, AgnosticCoupon, AgnosticDiscount } from '@vue-storefront/core';
-import { Cart, LineItem } from '@vue-storefront/shopify-api/src/types';
+import { Cart, LineItem } from '@mtcmedia/shopify-api/src/types';
 import { formatSelectedAttributeList } from './_utils';
 
 export const getCartItems = (cart: Cart): LineItem[] => {

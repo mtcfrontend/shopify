@@ -7,7 +7,7 @@ import {
   AgnosticBreadcrumb,
   AgnosticFacet
 } from '@vue-storefront/core';
-import { ProductVariant } from "@vue-storefront/shopify-api";
+import { ProductVariant } from "@mtcmedia/shopify-api";
 import { enhanceProduct, getSortedProducts } from '../helpers/internals';
 import { buildBreadcrumbs, buildFacets, reduceForGroupedFacets, reduceForFacets } from './../useFacet/_utils';
 import { getCategoryTree as buildCategoryTree } from './categoryGetters';

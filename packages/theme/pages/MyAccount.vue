@@ -47,7 +47,7 @@
 <script type="module">
 import { SfBreadcrumbs, SfContentPages, SfMenuItem} from '@storefront-ui/vue';
 import { ref, computed, onBeforeMount } from '@nuxtjs/composition-api';
-import { useUser, userGetters, useContent } from '@vue-storefront/shopify';
+import { useUser, userGetters, useContent } from '@mtcmedia/shopify';
 
 import MyProfile from './MyAccount/MyProfile';
 import AdressBook from './MyAccount/AdressBook';

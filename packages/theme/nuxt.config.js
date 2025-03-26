@@ -69,8 +69,8 @@ const config = {
         coreDevelopment: true,
         // @core-development-only-end
         useRawSource: {
-          dev: ['@vue-storefront/shopify', '@vue-storefront/core'],
-          prod: ['@vue-storefront/shopify', '@vue-storefront/core']
+          dev: ['@mtcmedia/shopify', '@vue-storefront/core'],
+          prod: ['@mtcmedia/shopify', '@vue-storefront/core']
         }
       }
     ],
@@ -80,9 +80,9 @@ const config = {
       {
         generate: {
           replace: {
-            apollo: '@vue-storefront/shopify-apollo',
-            apiClient: '@vue-storefront/shopify-api',
-            composables: '@vue-storefront/shopify'
+            apollo: '@mtcmedia/shopify-apollo',
+            apiClient: '@mtcmedia/shopify-api',
+            composables: '@mtcmedia/shopify'
           }
         }
       }
@@ -92,7 +92,7 @@ const config = {
     ['@vue-storefront/nuxt-theme'],
     project-only-end */
     [
-      '@vue-storefront/shopify/nuxt',
+      '@mtcmedia/shopify/nuxt',
       {
         i18n: {
           useNuxtI18nConfig: true

@@ -7,7 +7,7 @@ export default defineConfig({
     lib: {
       formats: ['es', 'cjs'],
       entry: path.resolve(__dirname, 'src/library.ts'),
-      name: '@vue-storefront/shopify-apollo',
+      name: '@mtcmedia/shopify-apollo',
       fileName: (format) => `vsf-shopify-apollo.${format}.js`
     },
     outDir: 'lib',

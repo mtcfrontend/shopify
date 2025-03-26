@@ -122,8 +122,8 @@ import {
   useCategory,
   useSearch,
   useContent
-} from '@vue-storefront/shopify';
-import { ContentType } from '@vue-storefront/shopify/src/types/ContentType';
+} from '@mtcmedia/shopify';
+import { ContentType } from '@mtcmedia/shopify/src/types/ContentType';
 
 export default {
   components: {

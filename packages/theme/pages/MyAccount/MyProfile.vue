@@ -170,7 +170,7 @@ import { ref, computed } from '@nuxtjs/composition-api';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { email, required, min, confirmed } from 'vee-validate/dist/rules';
 import { SfInput, SfButton, SfProperty, SfHeading } from '@storefront-ui/vue';
-import { useUser, userGetters } from '@vue-storefront/shopify';
+import { useUser, userGetters } from '@mtcmedia/shopify';
 import { onSSR } from '@vue-storefront/core';
 import { useUiNotification } from '~/composables';
 import Tab from '~/components/Tab.vue';

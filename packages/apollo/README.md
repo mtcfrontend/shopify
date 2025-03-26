@@ -1,4 +1,4 @@
-# `@vue-storefront/shopify-apollo`
+# `@mtcmedia/shopify-apollo`
 
 > This is a library that used inside API Client to handle all apollo query related for shopify
 > This also a step forward when we migrate to all queries should be handle by apollo client
@@ -6,7 +6,7 @@
 ## Usage
 
 ```typescript
-import { createShopifyApollo, getShopifyApolloAPIs } from '@vue-storefront/shopify-apollo'
+import { createShopifyApollo, getShopifyApolloAPIs } from '@mtcmedia/shopify-apollo'
 
 const client = createShopifyApollo(settings)
 

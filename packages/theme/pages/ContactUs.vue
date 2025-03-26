@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { useContent } from '@vue-storefront/shopify';
+import { useContent } from '@mtcmedia/shopify';
 import { onSSR } from '@vue-storefront/core';
 
 export default {

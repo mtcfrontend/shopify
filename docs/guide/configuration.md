@@ -27,7 +27,7 @@ Shopify configuration is located in two places:
 module.exports = {
   integrations: {
     shopify: {
-      location: '@vue-storefront/shopify-api/server',
+      location: '@mtcmedia/shopify-api/server',
       configuration: {
         api: {
           domain: 'YOUR SHOPIFY STORE DOMAIN',

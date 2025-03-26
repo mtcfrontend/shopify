@@ -199,7 +199,7 @@ import { ref, watch, reactive, computed, useRouter, useContext } from '@nuxtjs/c
 import { SfModal, SfInput, SfButton, SfCheckbox, SfLoader, SfBar } from '@storefront-ui/vue';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required, email } from 'vee-validate/dist/rules';
-import { useUser, useForgotPassword } from '@vue-storefront/shopify';
+import { useUser, useForgotPassword } from '@mtcmedia/shopify';
 import { useUiState, useUiNotification } from '~/composables';
 
 extend('email', {

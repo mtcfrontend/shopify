@@ -60,7 +60,7 @@ import {
   useProduct,
   useCart,
   productGetters
-} from '@vue-storefront/shopify';
+} from '@mtcmedia/shopify';
 import {
   computed
 } from '@nuxtjs/composition-api';

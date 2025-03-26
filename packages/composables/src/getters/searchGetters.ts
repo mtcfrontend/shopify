@@ -1,6 +1,6 @@
 import { AgnosticBreadcrumb, AgnosticCategoryTree, AgnosticFilter, AgnosticMediaGalleryItem, AgnosticPagination, AgnosticPrice, AgnosticSort, UseSearchGetters } from '@vue-storefront/core'
-import { QueryResult } from '@vue-storefront/shopify-apollo/src/library'
-import { Product } from '@vue-storefront/shopify-apollo/src/shopify'
+import { QueryResult } from '@mtcmedia/shopify-apollo/src/library'
+import { Product } from '@mtcmedia/shopify-apollo/src/shopify'
 import { enhanceProduct } from '../helpers/internals'
 
 const searchGetters: UseSearchGetters<QueryResult, Product> = {

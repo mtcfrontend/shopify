@@ -40,8 +40,8 @@ export default function(moduleOptions) {
   }
 
   this.extendBuild((config) => {
-    config.resolve.alias['@vue-storefront/shopify-api$'] = path.resolve(
-      '@vue-storefront/shopify-api'
+    config.resolve.alias['@mtcmedia/shopify-api$'] = path.resolve(
+      '@mtcmedia/shopify-api'
     );
   });
   this.addPlugin({

@@ -42,7 +42,7 @@ import {
   SfCheckbox,
   SfAddressPicker
 } from '@storefront-ui/vue';
-import { userBillingGetters } from '@vue-storefront/shopify';
+import { userBillingGetters } from '@mtcmedia/shopify';
 
 export default {
   name: 'UserBillingAddresses',

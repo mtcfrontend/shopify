@@ -4,15 +4,15 @@ import {
   AgnosticPrice,
   ProductGetters
 } from '@vue-storefront/core';
-import { ProductVariant } from '@vue-storefront/shopify-api/src/types';
+import { ProductVariant } from '@mtcmedia/shopify-api/src/types';
 import { enhanceProduct } from '../helpers/internals';
 import { formatAttributeList, capitalize } from './_utils';
 
 export type ProductVariantFilters = any
 
-export const getProductName = (product: ProductVariant): string => product?.name || undefined;
+export const getProductName = (product: any): string => product?.name || undefined;
 
-export const getFullProductName = (product: ProductVariant): string => {
+export const getFullProductName = (product: any): string => {
   if (product?.variantBySelectedOptions) {
     return `${product.name} - ${product.variantBySelectedOptions.title}`
   } else {
@@ -21,13 +21,13 @@ export const getFullProductName = (product: ProductVariant): string => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const getProductSlug = (product: ProductVariant): string => {
+export const getProductSlug = (product: any): string => {
   if (product) {
     return product._slug;
   }
 };
 
-export const getProductPrice = (product: ProductVariant): AgnosticPrice => {
+export const getProductPrice = (product: any): AgnosticPrice => {
   return {
     regular: product?.price?.original || 0,
     special: product?.price?.current || 0
@@ -45,7 +45,7 @@ export const getProductDiscountPercentage = (product): number => {
   return 0;
 };
 
-export const getProductGallery = (product: ProductVariant): AgnosticMediaGalleryItem[] =>
+export const getProductGallery = (product: any): AgnosticMediaGalleryItem[] =>
   (product ? product.images : [])
     .map((image) => {
       const imgPath = image.originalSrc.substring(0, image.originalSrc.lastIndexOf('.'));
@@ -104,7 +104,7 @@ export const getProductAttributes = (products: ProductVariant, filterByAttribute
     return {} as any;
   }
 
-  const formatAttributes = (product: ProductVariant): AgnosticAttribute[] => {
+  const formatAttributes = (product: any): AgnosticAttribute[] => {
     return formatAttributeList(product.options).filter((attribute) => filterByAttributeName ? filterByAttributeName.includes(attribute.name) : attribute);
   }
     
@@ -136,7 +136,7 @@ export const getProductAttributes = (products: ProductVariant, filterByAttribute
     .reduce(reduceByAttributeName, {});
 };
 
-export const getProductDescription = (product: ProductVariant, isWantHtml?: boolean): any => {
+export const getProductDescription = (product: any, isWantHtml?: boolean): any => {
   if (product) {
     if (isWantHtml) {
       return product._descriptionHtml;
@@ -223,7 +223,7 @@ export const getPDPProductCoverImage = (product, size = 'normal') => {
   return 'https://cdn.shopify.com/s/files/1/0407/1902/4288/files/placeholder_' + imgResolution + '.jpg?v=1625742127';
 };
 
-export const getProductStockStatus = (product: ProductVariant): boolean => {
+export const getProductStockStatus = (product: any): boolean => {
   if (product && product.variantBySelectedOptions && product.variantBySelectedOptions !== null) {
     if (product.variantBySelectedOptions.quantityAvailable > 0) {
       return true;
@@ -234,7 +234,7 @@ export const getProductStockStatus = (product: ProductVariant): boolean => {
   }
   return false;
 };
-export const getProductStock = (product: ProductVariant): number => {
+export const getProductStock = (product: any): number => {
   if (product && product.variantBySelectedOptions && product.variantBySelectedOptions !== null) {
     return product.variantBySelectedOptions.quantityAvailable;
   } else if (product && product.totalInventory) {
@@ -244,7 +244,7 @@ export const getProductStock = (product: ProductVariant): number => {
 };
 export const checkForWishlist = (product: ProductVariant): boolean => (product as any).isInWishlist ?? false;
 
-export const getBreadcrumbs = (product: ProductVariant): any => {
+export const getBreadcrumbs = (product: any): any => {
   const breadCrumbs = [
     {
       text: 'Home',

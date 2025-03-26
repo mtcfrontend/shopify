@@ -25,7 +25,7 @@ import addAddress from './api/addAddress';
 import updateAddress from './api/updateAddress';
 import checkOut from './api/checkOut';
 
-import { createShopifyApollo, getShopifyApolloAPIs } from '@vue-storefront/shopify-apollo'
+import { createShopifyApollo, getShopifyApolloAPIs } from '@mtcmedia/shopify-apollo'
 
 const CustomClient = require('shopify-buy/index.unoptimized.umd.min.js');
 
